@@ -1,0 +1,3201 @@
+This is MagikLangRef.info, produced by makeinfo version 4.8 from
+U:\sword\online\swcore\EmacsDoc\MagikLangRef_Info\Output/MagikLangRef.texi.
+
+INFO-DIR-SECTION Emacs
+START-INFO-DIR-ENTRY
+* Magik Language Reference: (MagikLangRef).	Magik Language Reference
+END-INFO-DIR-ENTRY
+
+
+File: MagikLangRef.info,  Node: Top,  Up: (dir)
+
+Magik Language Reference
+************************
+
+The sections in Magik language reference duplicate the information in Using
+the Magik language, but the description here is more rigorous and assumes some
+experience with using the language.
+
+   * *Note Syntactic elements:: summarises the simplest units of a program
+     such as literals, keywords, operators and simple statements.
+
+   * *Note Expressions assignment and invocation:: describes simple
+     expressions and also the language constructions used for compound
+     expressions. Assignment and routine invocations are included here as they
+     are both discrete operations which can themselves be expressions.
+
+   * *Note Compound statements:: lists all the compound statements of
+     Smallworld Magik, including blocks, conditionals, loops, statements for
+     transferring control and statements for handling unexpected events.
+
+   * *Note Defining procedures and methods:: specifies the syntax for all
+     possible ways of defining a procedure or method, and includes handling
+     argument lists and results.
+
+   * *Note Variable declarations:: gives the five types of variable
+     declaration with a description of the differences between them, and also
+     describes constant declarations, variable initialisation, use of packages
+     and the resolution of free variables.
+
+   * *Note Special characters and keywords:: lists all the special characters
+     and keywords used in Magik, with references to where they are introduced.
+
+* Menu:
+
+* Syntactic elements::
+* Expressions assignment and invocation::
+* Compound statements::
+* Defining procedures and methods::
+* Variable declarations::
+* Special characters and keywords::
+
+
+File: MagikLangRef.info,  Node: Syntactic elements,  Next: Expressions assignment and invocation,  Prev: Top,  Up: Top
+
+Syntactic elements
+******************
+
+This section summarises the simplest units of a program such as literals,
+keywords, operators and simple statements.
+
+* Menu:
+
+* Comments::
+* Literals::
+* Keywords and special values::
+* Identifiers such as labels and variables::
+* Operators::
+* Simple statements::
+
+
+File: MagikLangRef.info,  Node: Comments,  Next: Literals,  Up: Syntactic elements
+
+Comments
+========
+
+Comments are introduced by # and continue to the end of line. Anything in
+between is ignored by the compiler.
+
+     # This is a comment
+     4+6
+     # this is another comment
+
+Comments introduced by ## are public comments and can provide the external
+documentation of the code.
+
+See also `Magik Language: Classification and documentation of methods and
+procedures' and `Magik Language: Comments and comment style'.
+
+
+File: MagikLangRef.info,  Node: Literals,  Next: Keywords and special values,  Prev: Comments,  Up: Syntactic elements
+
+Literals
+========
+
+* Menu:
+
+* Integers::
+* Real numbers::
+* Characters::
+* Character strings::
+* Simple vectors::
+* Symbols::
+
+
+File: MagikLangRef.info,  Node: Integers,  Next: Real numbers,  Up: Literals
+
+Integers
+--------
+
+Simple literal integers are given in decimal using the digits 0-9. Negative
+integers are created by using the unary minus operator ( - ). For example:
+
+     45, 0, - 101
+
+Integers can be given to a base other than 10 by using radix notation. In this
+case the digits of the integer itself are preceded by the radix - an integer
+followed by r. With a radix greater than 10, letters are used for digits
+greater than 9; uppercase or lowercase letters may be used. For example, the
+following expressions are true:
+
+     2r101 = 5
+     -8r100 = -64
+     16RE = 14
+
+An integer can include an exponent; this is introduced by e, E or & and
+immediately follows the digits. For example:
+
+     2e10, 1&16
+
+Even if a radix is given, the exponent is interpreted as decimal. For example,
+the following expressions are true:
+
+     2r1e10 = 1 * 2**10 = 1024
+
+For literal integers in the range -2**29 to 2**29-1, the Smallworld Magik
+compiler uses the class integer; outside this range, class bignum is used.
+
+
+File: MagikLangRef.info,  Node: Real numbers,  Next: Characters,  Prev: Integers,  Up: Literals
+
+Real numbers
+------------
+
+Real numbers are held as objects of class float and are commonly called
+floating point numbers or floats. Simple literal floating point numbers are
+given in decimal and consist of at least one digit followed immediately by a
+decimal point and at least one more digit. For example:
+
+     0.5, 45.0
+
+Note that at least one digit is required before and after the decimal point;
+.5 and 45. are not valid literal numbers.
+
+Real numbers can be given to a base other than 10 by using radix notation; the
+digits of the number itself are preceded by the radix - an integer followed by
+r. With a radix greater than 10, letters are used for digits greater than 9.
+For example, the following expressions are true:
+
+     16rA0.8 = 160.5
+     -16rA0.8 = -160.5
+
+A real number may include an exponent introduced by e, E or & and consisting
+of an optional sign and decimal digits. For example:
+
+     23.007e5 = 2300700.0
+     0.4E-5 = 0.000004
+
+If a radix is given, the digits of the exponent are always interpreted as
+decimal and specify the number of powers of the radix. For example:
+
+     16rA0.8&2 = 160.5 * 16**2 = 41088.0
+
+
+File: MagikLangRef.info,  Node: Characters,  Next: Character strings,  Prev: Real numbers,  Up: Literals
+
+Characters
+----------
+
+The following options are available for a literal character, held as an object
+of class character:
+
+   * For printing characters, the literal character is preceded by %. For
+     example:
+          %q, %Z, %u
+
+   * For any character, you can use a form similar to Unicode representation:
+     %uXXXX where X is a hexadecimal digit. For example:
+          %u000A, %U004e, %u0041
+
+   * Where a character has a name, you can use the form %name. For example:
+          %newline, %space
+
+
+File: MagikLangRef.info,  Node: Character strings,  Next: Simple vectors,  Prev: Characters,  Up: Literals
+
+Character strings
+-----------------
+
+A literal character string is delimited by " (double quotes) and contains only
+printing characters. The character string is held as a char16_vector. For
+example:
+
+     "abc" "The cat sat on the mat " ""
+
+There is no escape notation for non-printing characters within the string, and
+a string may not continue onto a new line. However, expressions such as
+
+     <character string> + <character>
+
+are optimised if both parts are literals, so you can include non-printing
+characters like this:
+
+     "ab" + %tab + "bc"
+
+
+File: MagikLangRef.info,  Node: Simple vectors,  Next: Symbols,  Prev: Character strings,  Up: Literals
+
+Simple vectors
+--------------
+
+Creating a simple vector with given elements is a very common requirement, so
+a literal form of simple vector is implemented using { and } to delimit the
+elements. Each vector element may be an arbitrarily complex expression. For
+example:
+
+     { 1,2,3 }   { x+6 , y-9 }  { 22,"Hamlet",8.59 }
+
+Using the literal form of a simple vector is equivalent to using the
+simple_vector method new_with() and to using the procedure vec() with
+corresponding arguments. Use of the special notation allows the compiler to
+make extensive optimisation in cases where all elements are constants.
+
+A simple vector is created implicitly by the keywords _gather and _allresults;
+the keyword _scatter converts a simple vector into its elements; for other
+collections, the behaviour is defined by for_scatter().
+
+
+File: MagikLangRef.info,  Node: Symbols,  Prev: Simple vectors,  Up: Literals
+
+Symbols
+-------
+
+A symbol, implemented as an instance of class symbol, has the syntax of an
+identifier preceded by : (colon); see *Note Identifiers such as labels and
+variables:: for details of identifier syntax. For example, the following are
+symbols:
+
+     :fred  :m1?  :private
+
+Characters which are not valid in identifiers, or which are normally
+canonicalised and are required unchanged, must be preceded by the escape
+character \ or enclosed within ||. For example:
+
+     :|FOO<<|   :\Readonly  :|test()|  :|2times|
+
+There is no restriction on the length of a symbol. Symbols can be converted
+into character strings and vice versa, but this is a relatively slow process.
+
+A symbol is a read-only vector of characters, with indexed structure, for
+which there is only ever one with a particular spelling; symbols have
+enumerated behaviour. Symbols are useful for labelling unique instances of
+objects or as unique values with a mnemonic name. For example, object class
+names, method names and slot names are symbols, and symbols are widely used
+for values such as :readonly, :writable and :hard_readonly.
+
+
+File: MagikLangRef.info,  Node: Keywords and special values,  Next: Identifiers such as labels and variables,  Prev: Literals,  Up: Syntactic elements
+
+Keywords and special values
+===========================
+
+To avoid any conflict between keywords and other syntactic elements, keywords
+start with _ (underscore). A space, tab or newline is generally required to
+terminate a keyword, though this is sometimes unnecessary. For example:
+
+     MagikSF> _true.not
+     False
+
+Some keywords are used for operators and special values; others delimit
+compound statements. The operators are listed in *Note Operators:: and other
+keywords are introduced with the appropriate statements (for example, see
+special receivers in *Note Standard method invocation::); all keywords are
+summarised in *Note Keywords::.
+
+The following keywords are used for special values:
+
+   * _true, _false, _maybe. The two values true and false are used in Boolean
+     logic and the third value maybe is required for Kleenean logic.
+
+   * _unset usually indicates 'do not care' or 'not given'. For example, when
+     a variable is created but not initialised, it has this value.
+
+   * _no_way is used occasionally to indicate 'no sensible answer'.
+
+   * _thisthread denotes the current thread.
+
+Note that the special values _true, _false, _maybe, _unset and _no_way are
+implemented as the single objects in the enumerated classes of the
+corresponding name (true, false and so on).
+
+
+File: MagikLangRef.info,  Node: Identifiers such as labels and variables,  Next: Operators,  Prev: Keywords and special values,  Up: Syntactic elements
+
+Identifiers such as labels and variables
+========================================
+
+A similar syntax is used for variable names, method and class names, symbols
+and labels. They can all be regarded as identifiers.
+
+An identifier starts with a letter, ! or ? and can include letters, digits, !
+_ and ?. For example:
+
+     as_symbol  private?  !output!  Count  |Count|
+
+A letter is defined as a character for which letter? returns true, while a
+digit is a character for which digit? returns true.
+
+Note that identifiers are canonicalised (which is the same as forcing to
+lowercase for many languages) except for characters enclosed within | |, so
+Count and |Count| are two different identifiers.
+
+* Menu:
+
+* Labels::
+* Method names::
+* Package qualifiers in global variable names::
+
+
+File: MagikLangRef.info,  Node: Labels,  Next: Method names,  Up: Identifiers such as labels and variables
+
+Labels
+------
+
+When a procedure or block is labelled with an identifier, the identifier is
+preceded by @. For example, the _block statement has the form:
+
+     _block [@ <identifier>]
+         <block body>
+     _endblock
+
+
+File: MagikLangRef.info,  Node: Method names,  Next: Package qualifiers in global variable names,  Prev: Labels,  Up: Identifiers such as labels and variables
+
+Method names
+------------
+
+Some conventions are applied to the choice of identifiers used for method
+names:
+
+   * If a method returns a boolean result then its name should end in ?; if a
+     method returns a kleenean result then its name should end in ??. For
+     example:
+          integral?  is_class_of?()  surrounds??()
+
+   * If a method is slot-like - that is, it takes no arguments, returns a
+     single result and returns the same result on a subsequent invocation if
+     the target object is unchanged - then it is defined without brackets (
+     and ). For example:
+          size  class_name  zero?
+
+   * If a method cannot be strictly defined as private but is intended for
+     internal use within an object class only then its name includes !. This
+     often applies to friend or helper methods and to debug methods. For
+     example, the following are debugging methods:
+          sys!slot  sys!perform()
+
+See `Magik Language: Naming conventions in Magik' for more details.
+
+
+File: MagikLangRef.info,  Node: Package qualifiers in global variable names,  Prev: Method names,  Up: Identifiers such as labels and variables
+
+Package qualifiers in global variable names
+-------------------------------------------
+
+Every global variable is defined within a package, and the full form of a
+global variable name includes the package name followed by a colon (:). For
+example:
+
+     sw:!print_depth!  user:min_road
+
+If a global variable name is used without a package qualifier then it refers
+to a declaration within the current package or any parent package. A global
+variable name with a package qualifier refers to a declaration within a
+specific package. See also *Note Package statements:: and *Note Global
+declarations and the use of packages::.
+
+
+File: MagikLangRef.info,  Node: Operators,  Next: Simple statements,  Prev: Identifiers such as labels and variables,  Up: Syntactic elements
+
+Operators
+=========
+
+Magik operators are combined with values to construct expressions in the usual
+way. For example:
+
+     3+5   7*8-9.0   5 <= 6 _or 5 > 1
+
+Some operators are keywords, while others are special characters or sequences
+of characters.
+
+Spaces and tabs are not significant within an expression and can be inserted
+as required between a value and operator to improve the layout; use of
+newlines is described in *Note Simple statements::. Brackets ( and ) are used
+to control the order of evaluation; method invocation takes precedence over
+any operator. For example:
+
+     4/3.as_float  (4 _div 3).as_float
+
+Operators are overloaded; that is, the effect of an operator depends on the
+class of its operands. For binary operators, the class of both operands is
+taken into account and the order of operands may be significant. Meanings of
+operators in expressions with numbers and logical values are given here.
+
+The standard unary operators are:
+
+_not, ~    Synonyms for logical not.
++, -       Positive, negative.
+
+The standard binary operators are (in order of precedence):
+
+**                Exponentiation; for example 2**3 is 8.
+*, /, _div, _mod  Multiply, divide, integer division and remainder. Note that
+                  the result of / between integers is retained as a ratio.
++, -              Addition, subtraction.
+<, <=, >, >=, _cf Relational comparisons. _cf returns true, maybe or false
+                  depending on whether the second operand is greater than,
+                  equal to or less than the first; _cf is the base used for
+                  implementing the other comparisons.
+=, <>, _is, _isnt Equality and identity comparison equal, not equal, identical,
+                  not identical. ~= is a synonym for <>. Equality operators
+                  should generally be used for numeric objects; this is an
+                  efficient test. For other objects, equality and identity may
+                  give different results; an identity test is often appropriate
+                  and will be more efficient.
+                  See `Magik Language: Equality and identity' for a more
+                  extensive discussion of equality and identity.
+_and, _andif      Logical conjunction for booleans. _andif is the same as _and
+                  except that the right hand side is not evaluated if the left
+                  is false. _and is also defined as a bitwise operator on
+                  integers.
+_xor              Exclusive or, defined both for booleans and as a bitwise
+                  operator for integers.
+_or, _orif        Logical disjunction for booleans. _orif is the same as _or
+                  except that the right hand side is not evaluated if the left
+                  is true. _or is defined as a bitwise operator for integers.
+
+
+File: MagikLangRef.info,  Node: Simple statements,  Prev: Operators,  Up: Syntactic elements
+
+Simple statements
+=================
+
+An expression, assignment, method invocation or procedure invocation may be a
+complete simple statement; these are all described in more detail in *Note
+Expressions assignment and invocation::. Spaces and tabs can be used within
+and between statements to improve the layout.
+
+A simple statement may have a result and may be used in an expression or
+argument list. Simple statements make up statement sequences used in compound
+statements (see *Note Compound statements::).
+
+If a newline is placed at the end of a syntactically valid statement then the
+newline terminates the statement. Newlines may be used within a statement to
+improve its layout in positions where the statement cannot validly end, such
+as between an operator and its value, or between arguments in an argument list.
+
+A ; (semicolon) may be used to separate statements on one line in a Magik
+source code file.
+
+A $ (dollar) on a line by itself terminates a chunk of code (which must
+contain complete statements) and forces compilation and execution of the chunk.
+
+
+File: MagikLangRef.info,  Node: Expressions assignment and invocation,  Next: Compound statements,  Prev: Syntactic elements,  Up: Top
+
+Expressions assignment and invocation
+*************************************
+
+This section describes simple expressions and also lvalue tuples and rvalue
+tuples which can be regarded as compound expressions. Assignment and routine
+invocations are included here as they are both discrete operations which can
+themselves be expressions.
+
+* Menu:
+
+* Expressions::
+* Lvalue tuples and rvalue tuples::
+* Assignment::
+* Method and procedure invocation::
+
+
+File: MagikLangRef.info,  Node: Expressions,  Next: Lvalue tuples and rvalue tuples,  Up: Expressions assignment and invocation
+
+Expressions
+===========
+
+Smallworld Magik is an expression-oriented language so in practice the
+majority of language constructs have values and can be used in expressions. An
+expression can be:
+
+   * A literal such as an integer, character string or symbol, for example:
+          123  "fred"  :readonly
+
+   * A variable name (which is syntactically an identifier); the value depends
+     on the object currently assigned to the variable. For example:
+          count  !print_length!  a_set
+
+   * A global variable name preceded by @; the value is the global variable.
+     The global variable name may include a package qualifier. For example:
+          @!output!  @sw:!output!
+
+   * A procedure or method invocation (see *Note Method and procedure
+     invocation:: for details), for example:
+          date_now()  15.as_float  15.5.integer?  my_vector[5]
+
+   * A unary operator followed by an expression, for example:
+          - 123   _not end?
+
+   * An expression followed by a binary operator and another expression, for
+     example:
+          3+5   end-start   end _cf start
+
+   * A compound statement such as a conditional or a loop. Compound statements
+     are described in *Note Compound statements::. For example:
+          _if length > 32 _then >> 32 _else >> length _endif
+
+   * An assignment, boot assignment or operator assignment (see *Note
+     Assignment:: for details), for example:
+          name << "fred"
+          length ^<< length+1
+          my_array[x+3,y+6] +<< 1
+
+   * An expression enclosed in round brackets.  Operators are defined with an
+     order of precedence (see *Note Operators::); the order of evaluation
+     between operators of the same precedence is undefined. Brackets can be
+     used if required to alter the evaluation order. In general, expressions
+     can be arbitrarily complicated. For example:
+
+          3 + 9           # 12
+          8 - 5 - 6       # -3 (evaluated left to right)
+          5 + 3 * -4      # -7 (* has higher precedence than +)
+          (5 + 3) * -4    # -32 (precedence overruled by brackets)
+
+     Note that method invocation takes precedence over arithmetic and
+     relational operators, and the right hand side of an assignment is
+     evaluated before the assignment itself.
+
+Spaces, tabs and newlines can be freely used between expressions to improve
+the layout of Magik code.
+
+
+File: MagikLangRef.info,  Node: Lvalue tuples and rvalue tuples,  Next: Assignment,  Prev: Expressions,  Up: Expressions assignment and invocation
+
+Lvalue tuples and rvalue tuples
+===============================
+
+An rvalue tuple defines a compound expression and an lvalue tuple defines a
+compound target, such as is required for parallel assignment or parallel
+declaration. For example, the following parallel assignment consists of an
+lvalue tuple, an assignment operator and an rvalue tuple:
+
+     (thing1,thing2) << (1,2)
+
+An lvalue tuple is a list of targets, separated by commas. An rvalue tuple is
+a list of expressions or a compound statement, procedure or method invocation
+which returns multiple results.
+
+In addition to parallel assignments and declarations, rvalue tuples can be
+used in returning a result from a block, method or procedure and in parameters
+for a routine invocation; lvalue tuples can be used in loop statements and
+argument lists in routine definitions. Note that brackets are required to
+delimit a tuple in a parallel assignment or declaration; brackets are optional
+in some other constructions.
+
+For example, a method find_xy() which returns two results can be used as
+follows:
+
+     (x,y) << 40.find_xy(10)
+
+If an lvalue tuple contains more targets than there are values supplied then
+unset is assigned to the extra targets; if an rvalue tuple contains more
+values than there are targets supplied then the extra values are ignored.
+
+* Menu:
+
+* Keywords _gather and _scatter::
+* Keyword _allresults::
+* Keyword _optional::
+
+
+File: MagikLangRef.info,  Node: Keywords _gather and _scatter,  Next: Keyword _allresults,  Up: Lvalue tuples and rvalue tuples
+
+Keywords _gather and _scatter
+-----------------------------
+
+The keywords _gather and _scatter can be used in lvalue and rvalue tuples
+respectively; this is useful when handling multiple results from a routine.
+
+The keyword _gather followed by a vector collects all the relevant values into
+the vector; if _gather is present, it must precede the last target in the
+lvalue tuple. In the following example, second and subsequent results from
+roots() are assigned to elements of rest:
+
+     (first, _gather rest) << roots(1,-6,-7,60)
+
+The _scatter keyword is the converse of the _gather keyword; _scatter followed
+by a vector, or any expression which evaluates to a vector, distributes the
+elements of the vector as single values. For example:
+
+     (i,j,k) << (_scatter rest)
+
+You can use _gather and _scatter in the same statement if required, for
+example:
+
+     (i, j, k, _gather rest) << (first, _scatter rootsvec)
+
+Any collection which responds to the method for_scatter() can be used with the
+_scatter keyword.
+
+See `Magik Language: Behaviour common to all collection classes' for details.
+
+
+File: MagikLangRef.info,  Node: Keyword _allresults,  Next: Keyword _optional,  Prev: Keywords _gather and _scatter,  Up: Lvalue tuples and rvalue tuples
+
+Keyword _allresults
+-------------------
+
+If an rvalue tuple contains a method or procedure invocation which returns
+multiple results, the keyword _allresults can be used to collect the results
+into a single vector. For example, the following assignments are equivalent:
+
+     ( _gather rootsvec ) << roots(1,-6,-7,60)
+     rootsvec << _allresults roots(1,-6,-7,60)
+
+You can use _scatter with _allresults to provide multiple results from one
+method or procedure as parameters to another routine; see also *Note Results
+from methods or procedures::. For example, the following invocation shows the
+first result of roots() only:
+
+     show( roots(1,-6,-7,60) )
+
+while this invocation shows all the results:
+
+     show( _scatter _allresults roots(1,-6,-7,60) )
+
+
+File: MagikLangRef.info,  Node: Keyword _optional,  Prev: Keyword _allresults,  Up: Lvalue tuples and rvalue tuples
+
+Keyword _optional
+-----------------
+
+The keyword _optional can be included in an lvalue tuple for an argument list
+in a method or procedure definition. This keyword introduces optional
+arguments for the routine, which do not need to have corresponding parameters
+in the routine invocation. Optional arguments must follow mandatory arguments,
+and optional arguments may be followed by _gather and a vector argument. See
+*Note Argument lists:: for details.
+
+
+File: MagikLangRef.info,  Node: Assignment,  Next: Method and procedure invocation,  Prev: Lvalue tuples and rvalue tuples,  Up: Expressions assignment and invocation
+
+Assignment
+==========
+
+A general assignment has the form:
+
+     <lvalue> <assignment operator> <rvalue>
+
+* Menu:
+
+* Simple assignment::
+* Boot assignment::
+* Operator assignment::
+* Parallel assignment::
+
+
+File: MagikLangRef.info,  Node: Simple assignment,  Next: Boot assignment,  Up: Assignment
+
+Simple assignment
+-----------------
+
+A simple assignment associates a single value with a variable or some other
+kind of assignment target. In Magik, the assignment operation is denoted by <<
+(pronounced becomes). The result of the assignment is the value assigned. For
+example:
+
+     test << 2           # assign the value 2; result is 2
+     (test << 3) + 1     # assignment in an expression; result is 4
+
+One assignment can be used in another assignment to provide serial assignment:
+
+     name << my_name << "Ermintrude"
+
+Note that a chevronned message, used to assign a value to a writable slot of
+an object, or to an element of an indexed object, has the same form as an
+assignment but is syntactically a method invocation (see *Note Method and
+procedure invocation:: for details). For example:
+
+   * if class my_coordinate has writable slots x and y, you can use:
+          a_coord << my_coordinate.new(0,0)
+          a_coord.x << 20
+          a_coord.y << 30
+
+   * if my_vector is of class simple_vector and thus has the methods [] and []
+     << defined on it, you can use:
+          x << my_vector[i]
+          my_vector[j] << 15
+
+The result of a simple assignment is the value assigned, regardless of the
+result of the chevronned message.
+
+
+File: MagikLangRef.info,  Node: Boot assignment,  Next: Operator assignment,  Prev: Simple assignment,  Up: Assignment
+
+Boot assignment
+---------------
+
+Sometimes it is more convenient for the result of an assignment to be the
+original value of the variable. In Magik this is denoted by the assignment
+operator ^<< (pronounced boot and becomes). For example:
+
+     number << 1                  # simple assignment, result is 1
+     old_number << number ^<< 2   # boot assignment, result is 1
+                                  # which is assigned to old_number
+                                  # number becomes 2
+
+
+File: MagikLangRef.info,  Node: Operator assignment,  Next: Parallel assignment,  Prev: Boot assignment,  Up: Assignment
+
+Operator assignment
+-------------------
+
+Assignments of the form:
+
+     target << target op expression
+
+where op is any binary operator (except _andif or _orif), can be written more
+succinctly in Magik as:
+
+     target op<< expression
+
+The assignment operator is, for example +<< (pronounced plus and becomes).
+This form may also be more efficient, as the target expression is only
+evaluated once. For example:
+
+     my_array[x+3,y-6] +<< 1
+
+is equivalent to:
+
+     my_array[x+3,y-6] << my_array[x+3,y-6] +1
+
+A boot assignment can also be given in this form. For example:
+
+     my_vector[i +^<< 1] << 3   # use old value of i for index,
+                                # then increment i
+
+
+File: MagikLangRef.info,  Node: Parallel assignment,  Prev: Operator assignment,  Up: Assignment
+
+Parallel assignment
+-------------------
+
+In a parallel assignment, several values are assigned at one time. The syntax
+is:
+
+     <lvalue tuple> <assignment> <rvalue tuple>
+
+See *Note Lvalue tuples and rvalue tuples:: for details of lvalue tuples and
+rvalue tuples; note that enclosing brackets are required in a parallel
+assignment. For example, if procedure min_and_max() returns two values, you
+could use:
+
+     (thing1,thing2) << min_and_max(3,6,1,89,-3)
+
+The elements of a tuple may be evaluated in any order. The value of a parallel
+assignment is an rvalue tuple with the values that are assigned.
+
+
+File: MagikLangRef.info,  Node: Method and procedure invocation,  Prev: Assignment,  Up: Expressions assignment and invocation
+
+Method and procedure invocation
+===============================
+
+* Menu:
+
+* Standard method invocation::
+* Field access method invocation::
+* Indexing method invocation::
+* Chevron and boot-chevron method invocation::
+* Access to instance variables::
+* Procedure invocation::
+* Results from methods or procedures::
+* Using a method to invoke a routine::
+
+
+File: MagikLangRef.info,  Node: Standard method invocation,  Next: Field access method invocation,  Up: Method and procedure invocation
+
+Standard method invocation
+--------------------------
+
+Object behaviour is invoked by sending an object a message. The syntax used
+for standard method invocation is:
+
+     <receiver> . <message_name> ( [<parameter_list>] )
+
+where <receiver> is a literal object or a handle onto an object and
+<message_name> is the name of a method defined on the object or a superclass.
+
+Note that a standard method is defined with brackets, even if it has no
+arguments, and the brackets are part of the name. If a standard method is
+defined with arguments, then its invocation includes a <parameter_list>, with
+the form of an rvalue tuple, enclosed in brackets (see *Note Lvalue tuples and
+rvalue tuples::). For example:
+
+     a_string.add_last(%z)  random.get()
+     min_and_max(_scatter roots(1,-6,-7,60))
+
+See *Note Argument lists:: for details of how the parameters in a parameter
+list are used to initialise arguments within the method.
+
+
+File: MagikLangRef.info,  Node: Field access method invocation,  Next: Indexing method invocation,  Prev: Standard method invocation,  Up: Method and procedure invocation
+
+Field access method invocation
+------------------------------
+
+A field access method has no brackets and no arguments. The syntax of an
+invocation is:
+
+     <receiver> . <message_name>
+
+where <receiver> is a literal object or a handle onto an object and
+<message_name> is the name of a method defined on the object or a superclass.
+
+The following examples show invocations of field access methods:
+
+     6.as_float  a_rope.size
+
+Note that a Magik programmer can define any method which takes no arguments as
+a field access method; the method name is defined without brackets (see *Note
+Method definitions::). Conventionally, only methods which are 'slot-like' are
+defined as field access methods, and an external user of the method does not
+know whether the result is returned by accessing an instance variable or by
+calculation; this is an important part of object encapsulation.
+
+See also `Magik Language: Defining a method name with or without brackets'.
+
+
+File: MagikLangRef.info,  Node: Indexing method invocation,  Next: Chevron and boot-chevron method invocation,  Prev: Field access method invocation,  Up: Method and procedure invocation
+
+Indexing method invocation
+--------------------------
+
+A special syntax is used for indexing methods; the syntax is:
+
+     <receiver> [ <argument_list> ]
+
+This treats the <receiver> as an indexed object and the argument list as one
+or more indices; the required result is returned. If two or more indices are
+supplied then they are separated by commas.
+
+For example, if my_vector is of class simple_vector, you can use:
+
+     x << my_vector[i]
+
+When an indexing method is defined, the number of arguments is significant
+(see *Note Indexing method definitions::). This means that, for example, a
+two-dimensional array can be defined with different methods for a single
+argument (returning a row or column) and for two arguments (returning an
+element). A class such as array_2 with two dimensions has separate methods []
+and [,]. For example:
+
+     a_vec << an_array_2[i]    # the first element is a 1D array
+     an_int << an_array_2[i,j] # an element of the first element
+                               # is an integer
+
+
+File: MagikLangRef.info,  Node: Chevron and boot-chevron method invocation,  Next: Access to instance variables,  Prev: Indexing method invocation,  Up: Method and procedure invocation
+
+Chevron and boot-chevron method invocation
+------------------------------------------
+
+Chevron and boot-chevron forms of any method can be defined.
+
+   * Chevron and boot-chevron indexing methods are used to set an element of
+     an indexed object. These have the form:
+          <receiver> [ <argument_list> ] <<
+          <receiver> [ <argument_list> ] ^<<
+
+     For example, if my_vector is of class simple_vector, and an_array_2 is a
+     two-dimensional array, you can use:
+
+          my_vector[j] << y
+          my_vector[i] ^<< z
+          an_array_2[i,j] << my_vector
+          an_array_2[i,j] ^<< x
+
+   * Chevron and boot-chevron forms of a field access method are sometimes
+     relevant. These have the forms:
+          receiver . <message_name> <<
+          receiver . <message_name> ^<<
+
+     For example, if a field access method gets the value of an instance
+     variable, then the chevron and boot-chevron forms update the value. For a
+     class my_coordinate with slots x and y and field access methods x and y,
+     the chevron and boot-chevron forms of the field access methods can be
+     used as follows:
+
+          a_coordinate.x << value
+          a_coordinate.y ^<< value
+
+   * Chevron and boot-chevron forms of standard methods can also be defined;
+     they are generally used for variants of indexing methods which require a
+     different syntax. These have the form:
+          receiver . <message_name> ( [<parameter_list>] ) <<
+          receiver . <message_name> ( [<parameter_list>] ) ^<<
+
+     For example, a method at0()<< is defined to update an element of a vector
+     using an index starting from 0 instead of from 1. The following
+     assignments are equivalent:
+
+          my_vector[j] << y
+          my_vector.at0(j+1) << y
+
+
+File: MagikLangRef.info,  Node: Access to instance variables,  Next: Procedure invocation,  Prev: Chevron and boot-chevron method invocation,  Up: Method and procedure invocation
+
+Access to instance variables
+----------------------------
+
+For a slotted object class, field access methods for any of the instance
+variables (slots) may be defined by using define_slot_access(). Each field
+access method may be public or private.
+
+See `Magik Language: Creating a slotted exemplar' for details.
+
+The field access method for an instance variable is also known as a get
+method. Chevron and boot-chevron forms of the field access methods may also be
+defined; these are known as set and boot methods respectively.
+
+For example, if class my_coordinate has slots x and y with a full range of
+field access methods defined, you can use these methods as follows:
+
+     value << a_coordinate.x
+     a_coordinate.x << value + 1
+     a_coordinate.y ^<< value
+
+Within a method on an object of the class itself or a subclass, you can refer
+to the instance variables directly by using the following forms:
+
+     .slot_name  .slot_name <<  .slot_name ^<<
+
+An instance variable can be accessed directly from subclasses of the class
+which defines the slot; however, this breaks the rules of strict encapsulation
+as it makes the subclass dependent on the structure of its superclass. Where a
+class is classified with usage subclassable, field access methods should be
+defined for instance variables and subclasses should make use of them. In this
+way, if the superclass is modified and uses a method to derive a value which
+was previously held in an instance variable, subclasses do not need to be
+changed.
+
+
+File: MagikLangRef.info,  Node: Procedure invocation,  Next: Results from methods or procedures,  Prev: Access to instance variables,  Up: Method and procedure invocation
+
+Procedure invocation
+--------------------
+
+A procedure invocation is simply the procedure with its arguments, if any,
+delimited by ( and ). Note that the brackets are required, even if the
+procedure has no arguments. For example, with a declaration such as:
+
+     _global quit << _proc ()
+                        ...
+                     _endproc
+
+quit() invokes the procedure, while quit is simply evaluated to return the
+procedure itself.
+
+A procedure, like a method, may be defined with arguments. In this case, the
+procedure invocation includes a parameter list with the form of an rvalue
+tuple. For example, if average() is a procedure which takes any number of
+arguments, and numbers is a vector of numbers, you can invoke average() as in
+the following examples:
+
+     average(_scatter numbers)   average(x, y, z, _scatter numbers)
+
+
+File: MagikLangRef.info,  Node: Results from methods or procedures,  Next: Using a method to invoke a routine,  Prev: Procedure invocation,  Up: Method and procedure invocation
+
+Results from methods or procedures
+----------------------------------
+
+A method or procedure can return no, one or multiple results; in addition, an
+individual method or procedure may always return the same number of results or
+the number of results may be determined at run-time.
+
+If a method or procedure returns no results then it cannot usefully be part of
+an expression and is generally a statement on its own. Procedures such as
+quit(), show() and print() are used in this way.
+
+If a method or procedure returns at least one result then it can be used in an
+expression or in an rvalue tuple (such as the argument list for another method
+or procedure invocation) and the result is used like any other value. For
+example:
+
+     4 / 3.as_float
+
+Note that any results after the first are generally ignored. For example, if
+min_and_max() returns two arguments, the following expression assigns the
+value 7 to result (see also *Note Lvalue tuples and rvalue tuples::):
+
+     result << 6 + min_and_max(3,6,1,89)
+
+A method or procedure invocation can be preceded by _allresults. This keyword
+has the effect of collecting all the results into a simple vector. For
+example, the procedure show() takes a list of arguments, but only uses one
+result from each. If you want to see both results from min_and_max() you must
+use both _allresults and _scatter:
+
+     MagikSF> show(min_and_max(3,6,1,89))
+             # first result only shown
+     1
+     MagikSF> show(_allresults min_and_max(3,6,1,89))
+             # simple vector created and shown
+     simple_vector:[1-2]
+     MagikSF> show(_scatter _allresults min_and_max(3,6,1,89))
+             # both results shown
+     1 89
+
+
+File: MagikLangRef.info,  Node: Using a method to invoke a routine,  Prev: Results from methods or procedures,  Up: Method and procedure invocation
+
+Using a method to invoke a routine
+----------------------------------
+
+Magik includes facilities to invoke a routine by treating the method or
+procedure itself as an object and sending it a message. These facilities can
+be useful when the name of the required routine is only determined at run-time.
+
+The method invoke() is defined for class procedure; you can invoke a procedure
+by sending it the message invoke(). For example, if quit() is defined as in
+*Note Procedure invocation::, the following statements are equivalent:
+
+     quit()
+     quit.invoke()
+
+Sending the message invoke() to a procedure object, or an expression which
+evaluates to a procedure object, is sometimes necessary to resolve an
+ambiguity; for example between a standard method and a field access method
+which returns a procedure.
+
+The method invoke() can be defined for other object classes and allows any
+object to be 'invoked'. For example, classes such as coordinate have a method
+invoke() which is defined as equivalent to new(). As a result, the following
+expressions are equivalent:
+
+     coordinate.new(x,y)     coordinate(x,y)
+
+The method iter_invoke() is used to invoke an iterator procedure, used in a
+controlled loop. For example, the following are equivalent:
+
+     _for i over range(1,12,2)
+     _for i over range.iter_invoke(1,12,2)
+
+The method perform() is defined for any object; sending perform() to an object
+with a method name as parameter invokes the method. Similar methods
+perform_private(), perform_iter() and perform_iter_private() are also defined.
+
+`Magik Language: Sending a message to an object' gives full details.
+
+The perform methods require the method name as a symbol. Note that | and | may
+be required to enclose characters which are not normally allowed in symbols.
+For example:
+
+   * For a field access method invoked as fred, the symbol is :fred.
+
+   * For a standard method invoked as fred(i), the symbol is :fred|()| or
+     :|fred()|.
+
+   * For an indexing method invoked as [i] or [i,j], the symbol is :|[]|.
+
+Chevron and boot-chevron forms have corresponding symbols such as :|fred<<|,
+:|fred()^<<|, :|[]<<|.
+
+
+File: MagikLangRef.info,  Node: Compound statements,  Next: Defining procedures and methods,  Prev: Expressions assignment and invocation,  Up: Top
+
+Compound statements
+*******************
+
+This section lists all the compound statements of Smallworld Magik including
+blocks, conditionals, loops, statements for transferring control, and
+statements for handling unexpected events.
+
+All the compound statements include one or more sequences of simple statements
+(statement sequences). Compound statements can have one or more results, and
+they can be used in an expression or parameter list for a routine invocation.
+
+* Menu:
+
+* Blocks::
+* Leave statements::
+* Conditionals::
+* Loops::
+* Catch and throw statements::
+* Protect and lock statements::
+* Try and handling statements::
+* Package statements::
+
+
+File: MagikLangRef.info,  Node: Blocks,  Next: Leave statements,  Up: Compound statements
+
+Blocks
+======
+
+The block is the simplest and least useful form of compound statement. It
+illustrates some common properties of the other forms.
+
+The form of a block is (optional parts in square brackets):
+
+     _block [ @ <identifier> ]
+         <statements>
+         [ >> <rvalue tuple> ]
+     _endblock
+
+The identifier preceded by @ is the block label. A block label may be
+necessary when blocks are nested, to identify the block for a _leave
+statement. Some other forms of compound statement do not have labels.
+
+The middle part of the block, incorporating the statements and result, is
+called the block body. This unit is used in other compound statements. The
+block body may include any number of statements, including zero.
+
+The statement
+
+     >> <rvalue tuple>
+
+if present, is the result statement and it must be the last statement in the
+block. The <rvalue tuple> is the result of the block. This can be given as a
+simple list of expressions; enclosing brackets are not required.
+
+For example:
+
+     # a block labelled foo which has one result 3
+     _block @foo
+         fred << 2
+         >> fred+1
+     _endblock
+
+
+File: MagikLangRef.info,  Node: Leave statements,  Next: Conditionals,  Prev: Blocks,  Up: Compound statements
+
+Leave statements
+================
+
+The _leave statement can be used to terminate execution of a block or loop
+before the end; control is transferred to the next statement after the block
+or loop.
+
+The form of a _leave statement is:
+
+     _leave [ @ <identifier> ] [_with <rvalue tuple> ]
+
+The optional label of a leave statement is an identifier preceded by @. If a
+label is not given then a _leave statement terminates execution of the nearest
+textually enclosing block or loop. If a label is given then a _leave statement
+with a label terminates execution of the nearest textually enclosing block or
+loop with a matching label.
+
+See `Magik Language: Labelling loops' for an example.
+
+The result of a _leave statement is introduced by the keyword _with and is an
+rvalue tuple (with the same form as the result of a block). When a _leave
+statement is executed, a block body result statement starting with >> is not
+evaluated and the result of the block is as given by the _leave statement
+instead.
+
+In the following example, the value assigned to next is either the value of
+fred or the value of biggest:
+
+     next <<
+     _block
+         fred << 2
+         _if fred < biggest
+         _then _leave _with biggest
+         _endif
+               # more code
+               ...
+         >> fred
+     _endblock
+
+
+File: MagikLangRef.info,  Node: Conditionals,  Next: Loops,  Prev: Leave statements,  Up: Compound statements
+
+Conditionals
+============
+
+Conditionals, introduced by _if, are probably the most common compound
+statements and allow one block body or another to be executed depending on a
+condition.
+
+The general form of a conditional in Magik is:
+
+     _if <condition1>
+     _then
+         <block body>
+     [ _elif <condition2>
+       _then
+         <block body> ]
+         ...
+     [ _else
+         <block body> ]
+     _endif
+
+Each condition can be any expression which evaluates to true or false. Any
+number of _elif clauses can be given, including zero, and the _else clause is
+also optional.
+
+Each time the conditional statement is executed, the conditions are evaluated
+in turn until one is found which returns the result true. The block body of
+the corresponding _then clause is executed and control is transferred to the
+next statement after _endif (unless the block body transfers control
+elsewhere). If all the conditions return false, the block body in the _else
+clause (if present) is executed. As a result, no more than one block body in a
+conditional is executed on each occasion. The result of the conditional is the
+result of the block body which is executed.
+
+For example:
+
+     _if flag2 <> 0 _then count +<< 1 _else count -<< 1 _endif
+     _if x _then y << 0 _endif # y becomes 0 if x is true
+     count +<< _if increase? _then >> 1 _else >> -1 _endif
+
+
+File: MagikLangRef.info,  Node: Loops,  Next: Catch and throw statements,  Prev: Conditionals,  Up: Compound statements
+
+Loops
+=====
+
+Loops are used to implement iteration. There are two kinds of loop:
+
+   * infinite loops, or uncontrolled loops, where a block body is executed
+     repeatedly until control is explicitly transferred outside the loop
+
+   * controlled loops where loop variables take one of a defined set of values
+     for each execution of the block body
+
+* Menu:
+
+* Infinite loops::
+* Controlled loops::
+* Continue statements::
+
+
+File: MagikLangRef.info,  Node: Infinite loops,  Next: Controlled loops,  Up: Loops
+
+Infinite loops
+--------------
+
+An infinite loop has the form:
+
+     _loop [ @ <identifier> ]
+        <block body>
+     _endloop
+
+Once control is transferred to a loop, the block body is executed repeatedly
+until interrupted by a _leave, _return or _throw statement. These statements
+can return a result from the loop. For example:
+
+     # skip to end of line
+     _loop
+         _if (it << next_thing()) _is :end_of_line
+         _then _leave _with it
+         _endif
+     _endloop
+
+A labelled _leave statement terminates execution of an enclosing loop with a
+matching label and is useful in controlling execution of nested loops; an
+unlabelled _leave statement terminates execution of the next outer loop.
+
+See `Magik Language: Labelling loops' for an example.
+
+The syntax of an identifier is described in *Note Identifiers such as labels
+and variables::.
+
+
+File: MagikLangRef.info,  Node: Controlled loops,  Next: Continue statements,  Prev: Infinite loops,  Up: Loops
+
+Controlled loops
+----------------
+
+The execution of a controlled loop is determined by an iterator method or
+procedure. An iterator is like a standard method or procedure except that,
+once invoked, it can suspend execution and yield one or more values to a loop.
+When resumed, it may yield another set of values. For each set of values, the
+loop is executed once. Eventually, the iterator returns and the loop
+terminates.
+
+The form of a controlled loop is:
+
+     [ _for <lvalue tuple> ] _over <iter invocation>
+     _loop [ @<identifier> ]
+         <block body>
+     [ _finally [ _with <lvalue tuple> ]
+         <block body> ]
+     _endloop
+
+The <lvalue tuple> after the keyword _for specifies the loop variables; it may
+be empty in which case _for is omitted. If any variables are given then they
+receive corresponding values yielded by the iterator on each invocation. If
+too few loop variables are given then the extra values from the iterator are
+ignored; if more loop variables are given than the iterator yields values then
+the extra loop variables (at the end of the list) are given the value unset.
+The scope of the loop variables covers the loop block body only and does not
+include the _finally clause, nor the iterator itself.
+
+The execution of a controlled loop may be interrupted by a _leave, _return or
+_throw statement, just as for an infinite loop; these statements may return a
+result. If there is a result from each invocation of the loop body, this is
+passed to the iterator (see *Note Defining iterator methods and procedures::
+for details).
+
+The <lvalue tuple> after the keyword _finally specifies the final variables;
+these receive the final result or results of the iterator and their scope is
+the final block body only. If _finally is present, the result of the _finally
+block body is the result of the whole loop; otherwise the result is the result
+of the iterator (but very few iterators have a specific result).
+
+In the following example, keys_and_elements() is an iterator procedure defined
+for indexed classes which returns successive elements and their index
+positions.
+
+     thing << "apple"
+     a_vector << {"orange","pear","apple","banana"}
+     index <<
+     _for i,e _over a_vector.keys_and_elements()
+      _loop
+         _if e = thing           # if element e with key i is "apple"
+         _then _leave _with i    # result is key
+         _endif
+     _finally
+         write("could not find ",thing) # otherwise apple not found
+         _leave _with 0                 # return 0
+     _endloop
+
+The following example uses the iterator procedure range() simply to limit the
+number of times the loop is executed:
+
+     root << initial_approx
+     _over range(1,n)
+     _loop
+         root << iteration(root)
+     _endloop
+
+
+File: MagikLangRef.info,  Node: Continue statements,  Prev: Controlled loops,  Up: Loops
+
+Continue statements
+-------------------
+
+A _continue statement may be included in an infinite loop or in a controlled
+loop and terminates just one iteration of the loop.
+
+   * In an infinite loop, _continue transfers control to the top of the loop.
+
+   * In a controlled loop, _continue transfers control to the iterator which
+     yields the next set of values.
+
+The form of the _continue statement is similar to the form of the _leave
+statement:
+
+     _continue [ @ <identifier> ] [ _with <rvalue tuple> ]
+
+For example:
+
+     total << 0
+     _for e _over a_set.elements()
+     _loop
+         # ignore values that are not integers
+         _if _not e.integral? _then _continue _endif
+         total +<< e
+     _endloop
+
+In a controlled loop, any result returned by a _continue statement is passed
+to the iterator (see *Note Defining iterator methods and procedures::).
+
+
+File: MagikLangRef.info,  Node: Catch and throw statements,  Next: Protect and lock statements,  Prev: Loops,  Up: Compound statements
+
+Catch and throw statements
+==========================
+
+The statements _catch and _throw are similar to _block and _leave, except that
+whereas a _leave statement terminates a textually enclosing _block, a _throw
+statement terminates a dynamically enclosing _catch. Executing a _throw
+statement breaks through as many levels of invocation as necessary until a
+_catch statement with matching label is found.
+
+The forms of the statements are:
+
+     _catch <expression>
+         <block body>
+     _endcatch
+
+     _throw <expression> [ _with <rvalue tuple> ]
+
+The <expression> following _catch or _throw is the label (or tag) of the
+statement and is required. Any expression can be used to label a _catch or
+_throw, including the form @ <global variable>. Note that in early Smallworld
+products, the tag had the same form as a block label (i.e. @ <identifier>).
+
+If a _throw statement includes _with then the following rvalue tuple becomes
+the value of the corresponding _catch statement. If a _throw statement does
+not include _with then the corresponding _catch statement has value unset.
+
+See `Magik Language: Catch and throw statements' for an example.
+
+Note that a _throw inside a controlled loop is not matched with a _catch in
+the controlling iterator (see *Note Defining iterator methods and
+procedures::).
+
+
+File: MagikLangRef.info,  Node: Protect and lock statements,  Next: Try and handling statements,  Prev: Catch and throw statements,  Up: Compound statements
+
+Protect and lock statements
+===========================
+
+* Menu:
+
+* Protect statements::
+* Lock statements::
+* Combining protect and lock statements::
+
+
+File: MagikLangRef.info,  Node: Protect statements,  Next: Lock statements,  Up: Protect and lock statements
+
+Protect statements
+------------------
+
+A _protect statement is used to ensure that some code is executed even when
+the normal flow of control is altered by a _leave, _return or _throw
+statement. For example, you can ensure that a file is closed even if an error
+is detected and halts normal processing.
+
+The _protect statement consists of a protected block of code (introduced by
+_protect) and a block of protection code (introduced by _protection). The
+protection code is always executed, whether the protected code is executed
+completely or is aborted.
+
+The form of the _protect statement is:
+
+     _protect
+         <block body>
+     _protection
+         <block body>
+     _endprotect
+
+The following example shows how to use a _protect statement to ensure that a
+file is closed:
+
+     stream << external_text_input_stream.new(a_file_name)
+     _protect
+         # do something with the file
+         ...
+     _protection
+         stream.close()
+     _endprotect
+
+Note the following points:
+
+   * The result of the _protect statement is the result of the protected block
+     body.
+
+   * It is not permissible to leave or return from within the protection code
+     (though a _throw statement can be used) because the protection code may
+     be executed from an environment when that would not be meaningful.
+
+   * If execution of a controlled loop is aborted, any protection code in the
+     controlling iterator is executed (see *Note Defining iterator methods and
+     procedures::).
+
+   * Execution of the protected block body cannot be interrupted by a higher
+     priority thread. As a result, the code should execute quickly and not
+     start a lengthy operation.  See `Magik Language: Threads for
+     multi-tasking'.
+
+
+File: MagikLangRef.info,  Node: Lock statements,  Next: Combining protect and lock statements,  Prev: Protect statements,  Up: Protect and lock statements
+
+Lock statements
+---------------
+
+A _lock statement is used to ensure that one thread has exclusive access to an
+object; even if the thread is interrupted, no other thread can update the
+object.
+
+The format is:
+
+     _lock <expression>
+        <block body>
+     _endlock
+
+The <expression> evaluates to an object for which exclusive access is
+required; the <block body> is only executed when exclusive access to the
+object is assured.
+
+
+File: MagikLangRef.info,  Node: Combining protect and lock statements,  Prev: Lock statements,  Up: Protect and lock statements
+
+Combining protect and lock statements
+-------------------------------------
+
+Protect and lock statements can be combined using the _protect _locking
+statement. This provides a protected block which is only executed when
+exclusive access to an object is assured. In addition, exclusive access to the
+object is retained in the protection code.
+
+The form of the _protect _locking statement is:
+
+     _protect _locking <expression>
+         <block body>
+     _protection
+         <block body>
+     _endprotect
+
+
+File: MagikLangRef.info,  Node: Try and handling statements,  Next: Package statements,  Prev: Protect and lock statements,  Up: Compound statements
+
+Try and handling statements
+===========================
+
+Try and handling statements are used to implement an error handling strategy
+in Magik code.
+
+Errors are signalled using conditions; when a potentially abnormal situation
+is detected, a named condition is raised. The best strategy for the majority
+of errors in a Smallworld application is to attempt an operation and then
+handle any resulting errors; _try and _handling statements are used for this.
+
+For full details of error handling and using conditions in Smallworld
+applications see:
+
+   - `Application Development Overview'
+
+   - `Application Development Techniques: The condition system'
+
+   - `Application Development Techniques: Using conditions'
+
+* Menu:
+
+* The _try statement::
+* The _handling statement::
+
+
+File: MagikLangRef.info,  Node: The _try statement,  Next: The _handling statement,  Up: Try and handling statements
+
+The _try statement
+------------------
+
+If a particular condition may be raised by a statement or statement sequence,
+a _try statement can be used to handle it.
+
+The form of a _try statement is:
+
+     _try
+        <block body 0>
+     _when <name list>
+        <block body 1>
+     _endtry
+
+The statements in <block body 0> are executed; control then normally passes to
+the next statement after _endtry. If a condition is raised whose name is
+included in <namelist>, or which is descended from a condition in <namelist>,
+the statements in <block body 1> are executed and, unless this includes a
+transfer of control, the next statement after _endtry is then executed.
+
+For example, if you know that the font methods new() and realise() may raise
+the condition font_not_defined, you can use the following code to provide a
+default font:
+
+     _try
+        f << font.new(name,size).realise()
+     _when font_not_defined
+        f << default_font
+     _endtry
+
+
+File: MagikLangRef.info,  Node: The _handling statement,  Prev: The _try statement,  Up: Try and handling statements
+
+The _handling statement
+-----------------------
+
+A _handling statement is used to set up a handling procedure for a named
+condition wherever it is raised. A _handling statement must appear at the
+beginning of a block body; any number of _handling statements can be provided,
+but they must be grouped together.
+
+A simple _handling statement has the form:
+
+     _handling <name list> _with <procedure>
+
+A _handling statement is local to the block body in which it is defined. If a
+condition is raised whose name is included in <name list>, or which is
+descended from a condition in <namelist>, the <procedure> is executed with the
+condition as argument in the dynamic context where the condition was raised.
+
+For example, the following statement defines a local condition handler to
+count all errors which are raised and then pass the error on to another
+handler:
+
+     _handling error _with _proc(cond)
+                  _global error_count # holds count of errors
+                  error_count +<< 1
+                  # pass the condition on to the next handler
+                  cond.continue_handling()
+               _endproc
+
+In this example, the procedure is declared inline using reserved words _proc
+and _endproc; the condition is provided as argument cond. The condition method
+continue_handling() passes the original condition to the next handler so
+further action can be taken.
+
+The Magik run-time environment includes default handlers for conditions; these
+are accessed using the forms:
+
+     _handling <name list> _with _default
+     _handling _default
+
+
+File: MagikLangRef.info,  Node: Package statements,  Prev: Try and handling statements,  Up: Compound statements
+
+Package statements
+==================
+
+A package statement, introduced by the keyword _package, sets the current
+package held in !current_package!. The format is:
+
+     _package <name>
+
+where <name> is the name of an existing package.
+
+See `Magik Language: Packages' for details of defining packages.
+
+This statement is only allowed at the top level, either in a file or at the
+Magik prompt. The statement takes immediate effect (it does not have to be
+followed by $ on a line by itself) and controls how the Magik compiler
+resolves global variable names (see also *Note Global declarations and the use
+of packages::).
+
+The following example shows how the current package affects the resolution of
+the global variable y; note that package user is defined as a child of package
+sw:
+
+     MagikSF> _package sw
+
+     MagikSF> _global y << 15
+
+     MagikSF> _package user
+
+     MagikSF> _global y << 20
+     **** Warning: Global y hides  global_variable(sw:y)
+          global_shadowing(new=:y, shadowed=global_variable(sw:y))
+     MagikSF> y
+     20
+     MagikSF> _package sw
+
+     MagikSF> y
+     15
+
+When a package statement is used in a file, it affects compilation of that
+file only. A Magik source code file should contain just one package statement,
+and the package statement should be at the top of the file. For example, the
+file circle.magik in the geometry module of the Smallworld Core Spatial
+Technology product starts like this:
+
+     #% text_encoding = iso8859_1
+     _package sw
+     _pragma(classify_level=basic, topic={geometry,chainage})
+     ## A circle is defined as a centre point and radius.
+     ## It is actually stored as the centre point and a point on the
+     ## circumference.
+     new_indexed_exemplar(:circle,
+                _unset,
+                {:coords_vector, :sector_mixin})
+     $
+
+
+File: MagikLangRef.info,  Node: Defining procedures and methods,  Next: Variable declarations,  Prev: Compound statements,  Up: Top
+
+Defining procedures and methods
+*******************************
+
+This section specifies the syntax for all possible ways of defining a
+procedure or method, and includes handling argument lists and results.
+
+* Menu:
+
+* Introduction to defining procedures and methods::
+* Procedure definitions::
+* Method definitions::
+* Argument lists::
+* Receivers _self _super and _clone::
+* Returning results from a routine::
+* Chevronned and boot-chevron forms of methods::
+* Defining iterator methods and procedures::
+* Classification and documentation of methods and procedures::
+
+
+File: MagikLangRef.info,  Node: Introduction to defining procedures and methods,  Next: Procedure definitions,  Up: Defining procedures and methods
+
+Introduction to defining procedures and methods
+===============================================
+
+A method defines the behaviour of objects in the class on which it is defined,
+and of any subclasses; a message is sent to an individual object in order to
+invoke the method. A procedure simply defines and groups some Smallworld Magik
+statements which are executed by a procedure call; a procedure is itself an
+object of class procedure. See *Note Method and procedure invocation:: for
+details of invoking a method or procedure.
+
+Methods and procedures are sometimes described collectively as routines. Both
+methods and procedures may be defined with arguments and to return a result.
+Some naming conventions for methods and procedures are recommended; for
+example, the name of a routine which returns a boolean result should end in ?.
+
+See `Magik Language: Naming conventions in Magik' for more details.
+
+
+File: MagikLangRef.info,  Node: Procedure definitions,  Next: Method definitions,  Prev: Introduction to defining procedures and methods,  Up: Defining procedures and methods
+
+Procedure definitions
+=====================
+
+The form of a procedure definition is:
+
+     _proc [@ <identifier>] ( [<arguments>] )
+         <block body>
+     _endproc
+
+The label @ <identifier> is optional, but it is helpful to specify a label so
+that the procedure itself has a name and can be identified in tracebacks.
+
+The arguments to a procedure are optional and, if present, have the form of an
+lvalue tuple which can include the _optional keyword. Note that the brackets (
+) are required, even if a procedure has no arguments.
+
+A procedure can return a result; in this case, the block body includes a
+results statement (introduced by >>) or a _return statement (see *Note
+Returning results from a routine:: for details).
+
+A procedure is an object and, once created, is generally assigned to a
+variable so that it can be accessed. For example:
+
+     hello << _proc @greet()
+                 write("Hello World")
+              _endproc
+
+This defines a procedure named greet and assigns it to the variable hello. The
+procedure is invoked by hello(), while hello simply evaluates to the procedure
+greet itself.
+
+A variable can be defined using _global _constant with a procedure as its
+value (see *Note Variable declarations:: for details); in this case, the
+procedure does not need to be labelled explicitly because the name of the
+global variable is supplied as the procedure name by default. For example:
+
+     _global _constant hello << _proc()
+                                   write("Hello World")
+                                _endproc
+
+
+File: MagikLangRef.info,  Node: Method definitions,  Next: Argument lists,  Prev: Procedure definitions,  Up: Defining procedures and methods
+
+Method definitions
+==================
+
+There are several forms of method definition, reflecting the different forms
+of method invocation (see *Note Method and procedure invocation::):
+
+   * Definition of standard methods, field access methods and indexing methods
+     is described here.
+
+   * Chevron and boot-chevron forms of any method can be defined; this is
+     described in *Note Chevronned and boot-chevron forms of methods::.
+
+* Menu:
+
+* Standard method definitions::
+* Field access method definitions::
+* Indexing method definitions::
+* Defining a private method::
+* Defining an abstract method::
+
+
+File: MagikLangRef.info,  Node: Standard method definitions,  Next: Field access method definitions,  Up: Method definitions
+
+Standard method definitions
+---------------------------
+
+The definition for the standard form of method, which has the same sort of
+argument list as a procedure, looks like this:
+
+     [_private]
+         _method <receiver> . <message> [ (<arguments>) ]
+             <block body>
+         _endmethod
+
+For example, the integer method odd_even() is defined as follows:
+
+     _method integer.odd_even()
+         _if _self.odd?
+         _then write("This is an odd number")
+         _else write("This is an even number")
+         _endif
+     _endmethod
+
+The <receiver> and <message> have the syntax of identifiers. The <receiver> is
+the name of the class for which the method is to be defined and <message> is
+the base name of the method to which ( ) is added. If present, <arguments> is
+an lvalue tuple which may include the keyword _optional (see *Note Argument
+lists::).
+
+The block body may include a results statement (introduced by >>) or a _return
+statement (see *Note Returning results from a routine::).
+
+If a method is defined with brackets ( and ) then these are part of the
+message name. For example, a standard method odd_even() is different from a
+field access method odd_even. If the method takes any arguments then the name
+must include brackets, otherwise inclusion of brackets is a matter of naming
+convention.
+
+See `Magik Language: Defining a method name with or without brackets' for
+details.
+
+
+File: MagikLangRef.info,  Node: Field access method definitions,  Next: Indexing method definitions,  Prev: Standard method definitions,  Up: Method definitions
+
+Field access method definitions
+-------------------------------
+
+If a method takes no arguments, it may be defined as a field access method
+with the following form:
+
+     [_private]
+         _method <receiver> . <message>
+             <block body>
+         _endmethod
+
+For example:
+
+     _method association.key
+         >> .key
+     _endmethod
+
+Field access methods can conveniently be defined for instance variables of a
+slotted object by using the method define_slot_access().
+
+See `Magik Language: Creating a slotted exemplar'.
+
+By convention, a field access method should be 'slot-like'; that is, it
+returns a single result, makes no changes to the target object and returns the
+same result on a subsequent invocation for an unchanged object. Note that a
+field access method can derive its result by accessing a slot (instance
+variable) of the object or by any other means.
+
+
+File: MagikLangRef.info,  Node: Indexing method definitions,  Next: Defining a private method,  Prev: Field access method definitions,  Up: Method definitions
+
+Indexing method definitions
+---------------------------
+
+Indexing method definitions correspond to indexed method invocations (see
+*Note Indexing method invocation::). Each method definition has a fixed number
+of arguments enclosed in square brackets [ and ]; optional and gathered
+arguments are not allowed. Two or more indexing methods may be defined for the
+same object class, with different numbers of arguments.
+
+The form of an indexing method definition is:
+
+     [_private] _method <receiver>'[' <argument list> ']'
+         <block body>
+     _endmethod
+
+For example:
+
+     _method array_2[n]
+         ...
+     _endmethod
+
+     _method array_2[n,m]
+         ...
+     _endmethod
+
+As in a standard method definition, <receiver> has the syntax of an identifier
+and is the name of the class for which the method is to be defined.
+
+
+File: MagikLangRef.info,  Node: Defining a private method,  Next: Defining an abstract method,  Prev: Indexing method definitions,  Up: Method definitions
+
+Defining a private method
+-------------------------
+
+The keyword _private, if present, specifies that the method can only be
+invoked from other methods sent to an object of the same class or a subclass.
+In practice, such a method can only be sent to one of the special message
+receivers _self, _clone or _super from within a method on the same class or a
+subclass (see also *Note Receivers _self _super and _clone::). This is useful
+for internal methods doing tasks that would be meaningless or unsafe if
+invoked outside a specific context.
+
+In some cases, a method cannot be strictly private because its use cannot be
+restricted to other methods on the same object. This sort of method is
+sometimes known as a 'friend' method. Unless a method is classified as
+private, no restrictions are enforced within Magik. Methods intended as friend
+methods should contain ! (exclamation mark) within their names so as to be
+easily identified, and to allow special treatment by browsers.
+
+
+File: MagikLangRef.info,  Node: Defining an abstract method,  Prev: Defining a private method,  Up: Method definitions
+
+Defining an abstract method
+---------------------------
+
+When defining an abstract class which is intended as a parent for subclasses,
+it is often useful to define an abstract method which subclasses must
+implement.
+
+The keyword _abstract introduces an abstract method; this keyword should
+precede _private or _iter if these are present. The method should have an
+empty body; it is compiled to contain a body which raises the condition
+subclass_should_implement. As a result, if a subclass does not implement the
+method itself, the specific condition is raised when the abstract method is
+executed.
+
+For example:
+
+     _abstract _method hash_helper.match?(thing1, thing2)
+     ## Returns a boolean which is true if thing1 and thing2 should
+     ## be regarded as the same
+     ## Subclasses must provide an implementation of this method
+     _endmethod
+
+
+File: MagikLangRef.info,  Node: Argument lists,  Next: Receivers _self _super and _clone,  Prev: Method definitions,  Up: Defining procedures and methods
+
+Argument lists
+==============
+
+The argument list for a routine is specified as an lvalue tuple with the
+additional possibility of optional items. For example, the following procedure
+is defined with two arguments:
+
+     with_output_to <<
+           _proc @with_output_to( filename, a_proc )
+              # calls a_proc with output directed to
+              # an output stream to that file
+              ...
+           _endproc
+
+The arguments are implicitly declared as local variables and hide global or
+dynamic variables of the same name. Arguments are themselves hidden by local
+variables of the same name. On invoking the routine, the arguments are
+initialised to the corresponding item in the rvalue tuple of the parameter
+list. Recommended practice is to treat arguments as read-only except for
+initialising optional arguments.
+
+* Menu:
+
+* Optional arguments::
+* Gathered arguments::
+* Optional and gathered arguments::
+
+
+File: MagikLangRef.info,  Node: Optional arguments,  Next: Gathered arguments,  Up: Argument lists
+
+Optional arguments
+------------------
+
+For some routines, one or more of the arguments are optional. The keyword
+_optional, just before one of the items in the list, indicates that all the
+remaining arguments are optional. When the routine is invoked without any
+corresponding parameters, the arguments will have the value unset.
+
+For example, the method apropos() takes a string and an optional flag as
+arguments. It lists all the messages understood by that object which include
+the string as part of the name. By default, private methods are not listed,
+but the optional flag can indicate that they should be included. The
+definition is:
+
+     _method object.apropos( a_string, _optional list_private? )
+         _if list_private? _is _unset
+         _then list_private? << _false
+         _endif
+         ...
+     _endmethod
+
+
+File: MagikLangRef.info,  Node: Gathered arguments,  Next: Optional and gathered arguments,  Prev: Optional arguments,  Up: Argument lists
+
+Gathered arguments
+------------------
+
+The keyword _gather permits a routine to handle an unknown, large or unlimited
+number of arguments. This keyword can only be used for the last item in an
+argument list and collects the corresponding parameter and any following
+parameters into a simple vector. For example, if a routine is defined as:
+
+     _method my_object.test( a, b, _gather c )
+        ...
+     _endmethod
+
+and is invoked as:
+
+     an_object.test(1,2,3,4,5,6,7)
+
+the following assignments are made within the method:
+
+     a << 1
+     b << 2
+     c << {3,4,5,6,7}
+
+A gathered argument is always of class simple_vector; the length of the vector
+may be 0.
+
+
+File: MagikLangRef.info,  Node: Optional and gathered arguments,  Prev: Gathered arguments,  Up: Argument lists
+
+Optional and gathered arguments
+-------------------------------
+
+A gathered argument may appear after optional arguments; if no corresponding
+parameters are supplied then the optional arguments are unset and the gathered
+argument is an empty vector. For example, if a routine is defined as:
+
+     _method my_object.test( a, _optional b, _gather c )
+        ...
+     _endmethod
+
+and is invoked as:
+
+     an_object.test(1)
+
+the following assignments are made within the method:
+
+     a << 1
+     b << _unset
+     c << {}
+
+
+File: MagikLangRef.info,  Node: Receivers _self _super and _clone,  Next: Returning results from a routine,  Prev: Argument lists,  Up: Defining procedures and methods
+
+Receivers _self _super and _clone
+=================================
+
+The special receivers _self, _super and _clone can be used within a method;
+_self can also be used within a procedure.
+
+   * In a method, _self refers to the object which has been sent the message;
+     it can be considered as 'the current object'. In a procedure, _self is
+     the procedure object. _self can also be used by itself as an expression.
+
+   * In a method, _super is the same object as self but specifies that the
+     method lookup should be performed differently. The message name should be
+     looked up in the object's superclass method table. _super is very
+     commonly used in initialisation methods - the subclass method calls the
+     superclass initialisation and then initialises the new part unique to the
+     subclass.
+          _method foo.init()
+                _super.init()        # superclass initialisation
+                .my_slot << _unset   # my initialisation
+                >> _self
+          _endmethod
+
+     If a subclass inherits different methods with the same name from two or
+     more superclasses, the _super keyword can be qualified to specify the
+     name of the required superclass. For example, to invoke the method get()
+     on superclass bar:
+
+          _method foo.get()
+                >> _super(bar).get()
+          _endmethod
+
+   * In a method, _clone makes a new object that is identical to self. Methods
+     such as new() that create new objects of a given class typically start by
+     using _clone to copy an existing object. For example:
+          _method set.new()
+                >> _clone.init()
+          _endmethod
+
+     When self is an indexed object, the clone can be qualified with the
+     required new size; the new object is not then an exact duplicate of the
+     original because the data stored in it is different. The clone is filled
+     with unset or 0, depending on the data type for the class. For example:
+
+          _method simple_vector.new(n) # n is optional size
+                >> _clone(n)
+          _endmethod
+
+     _clone can also be used by itself as an expression.
+
+
+File: MagikLangRef.info,  Node: Returning results from a routine,  Next: Chevronned and boot-chevron forms of methods,  Prev: Receivers _self _super and _clone,  Up: Defining procedures and methods
+
+Returning results from a routine
+================================
+
+There are two ways to return values from a routine:
+
+   * By executing a _return statement from anywhere in the block body of the
+     routine. A _return statement has the form:
+          _return <rvalue tuple>
+
+   * By executing a result statement from the outermost block body of the
+     routine. A result statement has the form:
+          >> <rvalue tuple>
+
+Executing a _return statement transfers control directly out of the routine.
+The rvalue tuple, if present, gives the results of the routine. Executing a
+results statement inside a block transfers control out of the block only, and
+not necessarily out of the routine.
+
+For example, the following method uses nested results statements. Note that a
+common error is to omit the first >> in which case no result is returned:
+
+     _method simple_vector.includes1?(thing)
+         >> _for e _over _self.elements()
+            _loop
+               _if e _is thing _then _leave _with _true _endif
+            _finally
+               >> _false
+            _endloop
+     _endmethod
+
+The following example is equivalent but uses _return statements, which may
+give clearer code:
+
+     _method simple_vector.includes2?(thing)
+         _for e _over _self.elements()
+            _loop
+               _if e _is thing _then _return _true _endif
+         _endloop
+         _return _false
+     _endmethod
+
+See `Magik Language: Using _return or a results statement' for another
+comparison of _return and results statements.
+
+
+File: MagikLangRef.info,  Node: Chevronned and boot-chevron forms of methods,  Next: Defining iterator methods and procedures,  Prev: Returning results from a routine,  Up: Defining procedures and methods
+
+Chevronned and boot-chevron forms of methods
+============================================
+
+Chevronned and boot-chevronned method definitions correspond to chevron and
+boot-chevron method invocations. Chevron and boot-chevron forms of any method
+can be defined, though they are most common for indexing and field access
+methods.
+
+* Menu:
+
+* Forms of standard methods::
+* Forms of field access methods::
+* Forms of indexing methods::
+
+
+File: MagikLangRef.info,  Node: Forms of standard methods,  Next: Forms of field access methods,  Up: Chevronned and boot-chevron forms of methods
+
+Forms of standard methods
+-------------------------
+
+Chevron and boot-chevron forms of standard methods are defined as follows:
+
+     [_private]
+     _method <receiver> . <message> [ (<arguments>) ] << value
+         <block body>
+     _endmethod
+
+     [_private]
+     _method <receiver> . <message> [ (<arguments>) ] ^<< value
+         <block body>
+     _endmethod
+
+The following example shows a method defined to update a vector using an index
+starting from 0 instead of 1:
+
+     _method my_vector.at0(n) << thing
+     ## Set the Nth element using 0 based indexing.
+        _self[n+1] << thing
+     _endmethod
+
+
+File: MagikLangRef.info,  Node: Forms of field access methods,  Next: Forms of indexing methods,  Prev: Forms of standard methods,  Up: Chevronned and boot-chevron forms of methods
+
+Forms of field access methods
+-----------------------------
+
+Chevron and boot-chevron forms of field access methods are defined as follows:
+
+     [_private]
+     _method <receiver> . <message> << value
+         <block body>
+     _endmethod
+
+     [_private]
+     _method <receiver> . <message> ^<< value
+         <block body>
+     _endmethod
+
+Note that field access methods, including chevron and boot-chevron forms, can
+be defined for instance variables of a slotted object by using the method
+define_slot_access().
+
+See `Magik Language: Creating a slotted exemplar'.
+
+The following example shows the definition of a boot-chevron field access
+method:
+
+     _method association.value ^<< new_value
+         >> .value ^<< new_value
+     _endmethod
+
+
+File: MagikLangRef.info,  Node: Forms of indexing methods,  Prev: Forms of field access methods,  Up: Chevronned and boot-chevron forms of methods
+
+Forms of indexing methods
+-------------------------
+
+Chevron and boot-chevron forms of indexing methods are defined as follows:
+
+     [_private]
+     _method <receiver> '[' <arguments> ']' << value
+         <block body>
+     _endmethod
+
+     [_private]
+     _method <receiver> '[' <arguments> ']' ^<< value
+         <block body>
+     _endmethod
+
+For example, the indexing method to set an individual pixel in a simple_grid
+can be defined as follows:
+
+     _method simple_grid[x,y] << val
+        _self.data[y-.y0][x-.x0] << val
+     # Signal data changed
+        _self.changed_data()
+     _endmethod
+
+
+File: MagikLangRef.info,  Node: Defining iterator methods and procedures,  Next: Classification and documentation of methods and procedures,  Prev: Chevronned and boot-chevron forms of methods,  Up: Defining procedures and methods
+
+Defining iterator methods and procedures
+========================================
+
+Both methods and procedures can be defined as iterators; an iterator is used
+in a controlled loop and yields separate values for each invocation, see *Note
+Loops:: for examples.
+
+To define an iterator, the method or procedure definition is prefixed with the
+keyword _iter and the block body contains calls to a pseudo-procedure
+_loopbody(). Each call to _loopbody() yields its arguments as iterator values
+which are available to the _for clause of a controlled loop. The method or
+procedure may also return a result which is available to the _finally clause
+of the loop.
+
+The following example shows a definition for an iterative procedure which
+yields successive values of a Fibonacci series for each invocation. This
+procedure continues indefinitely and never returns.
+
+     _iter _proc fibonacci()
+         _loopbody(s1 << 1)
+         _loopbody(s2 << 1)
+         _loop
+             _loopbody(t << s1 + s2)
+             s1 << s2
+             s2 << t
+         _endloop
+     _endproc
+
+When defining and invoking an iterator method or procedure, note the following
+points:
+
+   * The iterator is not invoked within the body of the loop which it controls
+     and nor is the loop invoked within the iterator. Hence dynamic variables
+     declared inside the iterator are not visible within the body of the loop
+     and vice versa.
+
+   * A throw statement inside the body of the loop cannot transfer control to
+     a catch statement in the iterator and vice versa.
+
+   * The arguments to _loopbody() form an rvalue tuple and can include
+     expressions, assignments and routine invocations.
+
+   * If the body of the loop returns a result (using _continue _with or a
+     result statement) this is yielded to the iterator method or procedure as
+     the result of _loopbody().
+
+   * If a _leave, _return or _throw statement is executed within the body of
+     the loop, then the normal flow of control of the iterator is aborted and
+     any protection code active within the iterator is executed.
+
+
+File: MagikLangRef.info,  Node: Classification and documentation of methods and procedures,  Prev: Defining iterator methods and procedures,  Up: Defining procedures and methods
+
+Classification and documentation of methods and procedures
+==========================================================
+
+A _pragma statement preceding a routine definition provides classification
+information for the following routine. The form of a _pragma statement is:
+
+     _pragma (classify_level=<level>,
+              topic={<set of topics>},
+              [ usage={<set of usages>} ] )
+
+The available values for level, topics and usages are described in `Magik
+Language: Classification of methods and classes'.
+
+As described in *Note Comments::, a comment starting ## is identified as a
+public comment. Within a routine definition, public comments are treated as
+part of the external documentation of the routine and are available via the
+Class Browser and Class Documentation.
+
+
+File: MagikLangRef.info,  Node: Variable declarations,  Next: Special characters and keywords,  Prev: Defining procedures and methods,  Up: Top
+
+Variable declarations
+*********************
+
+This section gives the five types of variable declaration with a description
+of the differences between them, and also describes constant declarations,
+variable initialisation, the use of packages and the resolution of free
+variables.
+
+* Menu:
+
+* Introduction to variable declarations::
+* Local declarations::
+* Global declarations and the use of packages::
+* Dynamic declarations::
+* Import declarations::
+* Dynamic import declarations::
+* Constants declarations::
+* Variable initialisation::
+* Resolution of free variables::
+
+
+File: MagikLangRef.info,  Node: Introduction to variable declarations,  Next: Local declarations,  Up: Variable declarations
+
+Introduction to variable declarations
+=====================================
+
+Smallworld Magik includes variable declaration statements starting with
+keywords such as _local, _global and _dynamic. A variable can be declared
+before it is used - this gives detailed control over its initialisation and
+storage allocation. Magik includes rules for handling undeclared variables
+(see *Note Resolution of free variables::) so initial declaration of all
+variables is not required. However, including explicit declaration statements
+often improves the clarity of the code.
+
+A declaration of a variable is either defining, in which case new storage is
+allocated for the variable, or is usage-only, which means that existing
+storage for the variable will be used. For example, local variable
+declarations are defining because they cause a local variable to be created.
+Import variable declarations are usage-only, because they result in an
+existing variable being imported.
+
+Declaration statements do not have results.
+
+If a method or procedure invokes itself recursively, either directly or
+indirectly, this is correctly handled, because the Magik compiler provides new
+storage for relevant variables on each invocation.
+
+A defining declaration can specify an initial value for the new variable (see
+*Note Variable initialisation::). If no initial value is given, then the
+variable is initialised to unset. A defining declaration can include the
+keyword _constant, and subsequent assignment to the variable is prevented (see
+*Note Constants declarations::).
+
+A declaration statement can appear anywhere within Magik code, usually, though
+not necessarily, at the beginning of a block body. The scope of a declaration
+is from the declaration statement to the end of the block body in which it
+occurs (but see *Note Global declarations and the use of packages:: for the
+effect of packages in limiting the scope of global declarations). The
+variables declared will be visible within that scope in the same routine,
+including in nested blocks, though not in an embedded routine. If a variable
+declared in one routine is required in a second embedded routine then it must
+be imported into the second routine; see *Note Import declarations:: and *Note
+Dynamic import declarations:: for details.
+
+There are five types of declaration, introduced by the following keywords:
+
+   * _local
+
+   * _global
+
+   * _dynamic
+
+   * _import
+
+   * _dynamic _import
+
+In addition, some variables are implicitly declared, for example:
+
+   * Arguments to a procedure or method are implicitly declared local to the
+     body of the routine.
+
+   * Loop variables in a controlled loop statement are implicitly declared
+     with a scope which includes the loop body but excludes the iterator body.
+
+The treatment of variables which are used but not declared (that is, free
+variables) is described in *Note Resolution of free variables::.
+
+
+File: MagikLangRef.info,  Node: Local declarations,  Next: Global declarations and the use of packages,  Prev: Introduction to variable declarations,  Up: Variable declarations
+
+Local declarations
+==================
+
+Local variables are declared with the keyword _local.
+
+The declaration is defining: storage for the variable is created when the
+declaration is executed and is unique to the current invocation of the
+procedure or method. A recursive invocation of the same routine results in new
+storage for a local variable with the same name. Arguments of routines are
+implicitly declared as local variables (see also *Note Argument lists::).
+
+For example, the iterator method accumulate() includes a local variable
+declaration which is used in an inner block body:
+
+     _iter _method simple_vector.accumulate()
+        _local sum << 0                 # define and initialise sum
+        _for k,v _over _self.keys_and_elements()
+        _loop
+           sum +<< v
+           _loopbody(k,v,sum)
+        _endloop
+        _return sum
+     _endmethod
+
+If a local variable is required in another routine within the scope of its
+declaration, the variable must be imported into the second routine with an
+_import declaration (see *Note Import declarations::).
+
+
+File: MagikLangRef.info,  Node: Global declarations and the use of packages,  Next: Dynamic declarations,  Prev: Local declarations,  Up: Variable declarations
+
+Global declarations and the use of packages
+===========================================
+
+Global variables are declared with the keyword _global.
+
+A global declaration outside any routine or block (that is a top-level global
+declaration) is defining; storage is allocated for the variable and the
+variable is initialised. If a global variable is defined at the Magik prompt
+then it must be explicitly initialised.
+
+When used within a routine or block, global declarations are usage-only and
+give full access to the variable. For example, with the following declarations:
+
+     _global x << _unset
+     test << _proc()
+         _global x
+         write("value of x is: ",x)
+         x << 12
+         write("value of x is: ",x)
+     _endproc
+     $
+
+initialising x and invoking the procedure results in the following:
+
+     MagikSF> x << 13
+     13
+     MagikSF> test()
+     value of x is: 13
+     value of x is: 12
+     MagikSF> x
+     12
+
+A defining global declaration can be classified with a _pragma statement and
+can be preceded by public comments. The classification and comments are
+available via the Class Browser and Class Documentation; global variables are
+treated as methods on the pseudo-class <global>.
+
+* Menu:
+
+* Using packages::
+* Action for undeclared variables::
+
+
+File: MagikLangRef.info,  Node: Using packages,  Next: Action for undeclared variables,  Up: Global declarations and the use of packages
+
+Using packages
+--------------
+
+Packages are used to limit the scope of global variables declared at the top
+level. During a session, there is always a current package and one package can
+be defined to use another (the using package is also described as a child of
+the used package). A top-level global variable declaration is effective in the
+current package and the unqualified variable name can be used within the
+current package and any parent packages.
+
+The keyword _package introduces a package statement which sets the current
+package (see *Note Package statements::).
+
+A top-level global declaration is made within the current package. If a global
+variable with the given name already exists in a parent package, a warning is
+issued and the new variable shadows the existing variable - that is, the
+shadowed variable can only be accessed by including the package qualifier. For
+example:
+
+     MagikSF> _package sw
+
+     MagikSF> _global y << 15
+
+     MagikSF> _package user
+
+     MagikSF> _global y << 20
+     **** Warning: Global y hides  global_variable(sw:y)
+          global_shadowing(new=:y, shadowed=global_variable(sw:y))
+
+     MagikSF> write("value of user:y is ",y) # current package is user
+     value of user:y is 20
+     MagikSF> write("value of sw:y is ",sw:y)
+     value of sw:y is 15
+
+Dynamic, dynamic import and lower-level global declarations can all give a
+package qualified variable name to refer to a variable in a specific package.
+An unqualified global variable name refers to an unshadowed variable in the
+current package or in a parent package.
+
+Note that an expression of the form @<global variable name> evaluates to the
+global variable - this can be useful in passing global variables from another
+package as arguments to a routine.
+
+
+File: MagikLangRef.info,  Node: Action for undeclared variables,  Prev: Using packages,  Up: Global declarations and the use of packages
+
+Action for undeclared variables
+-------------------------------
+
+When a global declaration is used within a routine or block, a top-level
+declaration for the variable is expected.
+
+If the variable does not already exist and no package qualifier is given (or
+the package qualifier specifies the current package), the action of the
+compiler depends on the flag !global_auto_declare?!:
+
+   * if true, the Magik compiler creates a global variable with value unset
+
+   * if maybe, the Magik compiler interactively queries the user
+
+   * if false, the Magik compiler raises an error
+
+If a package qualifier is given and does not refer to the current package, no
+global is defined and an error is reported.
+
+For example, with !global_auto_declare?! set to maybe and no top-level global
+declaration of x, the procedure definition above results in the following
+prompt:
+
+     MagikSF> Loading <file>
+     --- line 0
+         _global x
+                    ^
+     Global x does not exist: create it? (y)
+
+
+File: MagikLangRef.info,  Node: Dynamic declarations,  Next: Import declarations,  Prev: Global declarations and the use of packages,  Up: Variable declarations
+
+Dynamic declarations
+====================
+
+Dynamic variable declarations have the keyword _dynamic.
+
+If a variable is defined as global then a new variable with the same name can
+be declared as dynamic inside a block or routine. This is a defining
+declaration where, by default, the new variable is initialised to the next
+outer global or dynamic variable. By convention, dynamic variables have names
+that start and end with '!', such as !print_length!, !output! and so on.
+
+For example, with the following declarations:
+
+     _global !x! << _unset
+     test << _proc()
+         _dynamic !x!
+         write("value of !x! is: ",!x!)
+         !x! << 12
+         write("value of !x! is: ",!x!)
+     _endproc
+     $
+
+the initial value of !x! is available inside the procedure test(), and !x! can
+be updated within the procedure, but it reverts to its original value on
+leaving the procedure:
+
+     MagikSF> !x! << 13
+     13
+     MagikSF> test()
+     value of !x! is: 13
+     value of !x! is: 12
+     MagikSF> !x!
+     13
+
+Dynamic variables are often used for system parameters that are sometimes
+modified locally. The global variable holds a default value, and a dynamic
+variable can be used to override this for the execution of some application
+code. The variable !print_length!, which determines how much information is
+output by the procedure print(), is used in this way.
+
+A dynamic variable can be imported dynamically (using _dynamic _import) into
+any routine which is invoked within the scope of the original declaration (see
+also *Note Dynamic import declarations::). This gives access to the current
+value of the dynamic variable. An import declaration (using _import) cannot be
+used for a dynamic variable.
+
+When initialising a dynamic variable, the value of the next outer dynamic or
+global variable with the same name is available to the initialisation
+expression. For example, this is useful in counting recursion depth:
+
+     _global !depth! << 0
+
+     _proc()
+         _dynamic !depth! << !depth! + 1
+         ...
+         _self()
+         ...
+     _endproc
+
+
+File: MagikLangRef.info,  Node: Import declarations,  Next: Dynamic import declarations,  Prev: Dynamic declarations,  Up: Variable declarations
+
+Import declarations
+===================
+
+A local variable can be imported into a textually enclosed routine by using an
+import declaration with the keyword _import. This is a usage-only declaration.
+Import variables are often used in helper functions, where a procedure that
+performs part of a routine is embedded within it, and also in routines that
+are passed as parameters.
+
+This example shows a local variable imported into a helper function:
+
+     _method my_object.foo()
+        _local x
+        ...
+        _proc @bar()
+           _import x
+           ...
+        _endproc
+     _endmethod
+
+In the following example, the procedure with_output_to() opens a file and
+executes a procedure which is defined in the parameter list. The parameter
+procedure imports a local variable passed as an argument to the outer
+procedure:
+
+     _proc( file, items )
+         ...
+         with_output_to( file, _proc()
+                                  _import items
+                                  do_something_with(items)
+                               _endproc )
+     _endproc
+
+Import variables are also used in procedure generators. The following
+procedure returns a procedure that will add a number to a value.
+
+     _global adder <<
+        _proc @adder(n)
+         >> _proc @add_n(x)
+             _import n
+             >> x + n
+             _endproc
+        _endproc
+
+You could use this procedure as follows:
+
+     MagikSF> z << adder(5)
+     proc add_n(x)
+     MagikSF> z(6)
+     11
+     MagikSF> y << adder(4)
+     proc add_n(x)
+     MagikSF> y(6)
+     10
+
+Note that importing n into the procedure add_n() requires that the dynamic
+scope of the relevant local variable - which in this case is an argument to
+the procedure adder() - is extended to cover the scope of the generated
+procedure.
+
+An import variable can be the target for an assignment - in this case, the
+relevant local variable is updated. For example, if the following code is
+executed:
+
+     _proc()
+        _local n
+        n << 1
+        _proc()
+           _import n
+           n +<< 1
+        _endproc ()
+        show(n)
+     _endproc
+
+the value of n is shown as 2.
+
+
+File: MagikLangRef.info,  Node: Dynamic import declarations,  Next: Constants declarations,  Prev: Import declarations,  Up: Variable declarations
+
+Dynamic import declarations
+===========================
+
+A dynamic import declaration is specified with the keyword combination
+_dynamic _import. This is a usage-only declaration (that is, it cannot include
+initialisation) and gives access to the next outer dynamic or global variable
+with the same name.
+
+Explicit declaration of a dynamic import variable is not usually necessary,
+provided that the name conforms to the convention of starting and ending with
+! and the value is accessed but not updated. Variables that do not conform to
+this convention will need to be declared explicitly, as otherwise they will
+probably be assumed to be global. In this case, if the variable is used as a
+dynamic, and its default global value is replaced, the dynamic value will be
+ignored.
+
+One of the most commonly used dynamic variables is !output!. This can be
+imported dynamically as in the following example:
+
+     _global _constant print << _proc(_gather things)
+         _dynamic _import !output!
+         _for e _over things.elements()
+         _loop
+             e.print_on(!output!)
+             !output!.newline()
+         _endloop
+     _endproc
+
+
+File: MagikLangRef.info,  Node: Constants declarations,  Next: Variable initialisation,  Prev: Dynamic import declarations,  Up: Variable declarations
+
+Constants declarations
+======================
+
+A defining declaration (that is, a local, dynamic or top-level global
+declaration) can be modified with the keyword _constant, which means that the
+declared variable may not be modified after it is initialised. The declaration
+must include initialisation, as described in *Note Variable initialisation::,
+because afterwards it is too late.
+
+Using the _constant keyword allows the Magik compiler to check for errors that
+modify the variable, and sometimes allows the generation of more efficient
+code. Code readability is also improved if variables which are not to be
+modified are specially marked.
+
+If a variable declared as constant is imported by another routine, the
+imported reference is implicitly also constant.
+
+The _constant keyword can come before or after the declaration keyword. For
+example:
+
+     _constant _local max_size << 40
+
+A global constant declaration is often used for assigning a procedure to a
+variable (see *Note Procedure definitions::).
+
+
+File: MagikLangRef.info,  Node: Variable initialisation,  Next: Resolution of free variables,  Prev: Constants declarations,  Up: Variable declarations
+
+Variable initialisation
+=======================
+
+A declaration which defines storage for the variable (that is a local, dynamic
+or top-level global declaration) can also initialise the variable. There are
+two forms of initialisation: sequential and parallel; in addition, a parallel
+initialisation may be specified as recursive.
+
+* Menu:
+
+* Sequential variable initialisation::
+* Parallel variable initialisation::
+* Recursive variable initialisation::
+
+
+File: MagikLangRef.info,  Node: Sequential variable initialisation,  Next: Parallel variable initialisation,  Up: Variable initialisation
+
+Sequential variable initialisation
+----------------------------------
+
+In a sequential initialisation, the variables are declared one after the
+other. It is as though there is a separate declaration statement for each
+variable.
+
+The form of the declaration is a list of identifiers or assignments separated
+by commas. For example:
+
+     _local i, first << true, count << 0
+
+
+File: MagikLangRef.info,  Node: Parallel variable initialisation,  Next: Recursive variable initialisation,  Prev: Sequential variable initialisation,  Up: Variable initialisation
+
+Parallel variable initialisation
+--------------------------------
+
+A parallel initialisation has the same form as a parallel assignment (this is
+not available for top-level global declarations):
+
+     <declaration> <lvalue tuple> <assignment> <rvalue tuple>
+
+The lvalue tuple is a list of identifiers, separated by commas, and the whole
+is enclosed in brackets. The rvalue tuple can either be a list of expressions,
+separated by commas and enclosed in brackets, or a compound statement, a
+procedure invocation or a method invocation which returns multiple results.
+The _gather and _scatter keywords can be used as required. For example:
+
+     _local (min,max) << min_and_max(a_list)
+
+The variables are effectively initialised at the same time (the order is
+undefined), and the variables declared are not visible in the rvalue tuple
+unless the declaration is modified with _recursive.
+
+
+File: MagikLangRef.info,  Node: Recursive variable initialisation,  Prev: Parallel variable initialisation,  Up: Variable initialisation
+
+Recursive variable initialisation
+---------------------------------
+
+A recursive initialisation is a parallel initialisation with the defined
+variables also visible in the rvalue tuple. The declaration is modified with
+the keyword _recursive. This is not often useful because the variables, though
+visible, have no value. However, it is sometimes necessary when defining
+mutually recursive procedures. For example:
+
+     _recursive _local (foo,bar) << (_proc @foo()
+                                            _import bar
+                                            ...
+                                            bar()
+                                            ...
+                                     _endproc,
+                                     _proc @bar()
+                                            _import foo
+                                            ...
+                                            foo()
+                                            ...
+                                     _endproc)
+
+
+File: MagikLangRef.info,  Node: Resolution of free variables,  Prev: Variable initialisation,  Up: Variable declarations
+
+Resolution of free variables
+============================
+
+Variables which are used but not declared are called free variables, and the
+Magik compiler uses the following rules to determine how to deal with them:
+
+   * If the variable is assigned to, it is declared as local. The declaration
+     appears at the beginning of the block or routine, but the variable is
+     visible only after it is first used.
+
+   * If the variable name starts and ends with '!' (for example, !length!)
+     then it is declared as dynamic import.
+
+   * Otherwise the variable is declared as global. If the name does not
+     include a package qualifier and there is no matching top level global,
+     then the value of !global_auto_declare?! determines the subsequent
+     behaviour:
+        - if true, the Magik compiler creates a global variable with value
+          unset
+
+        - if maybe, the Magik compiler interactively queries the user (see
+          *Note Global declarations and the use of packages:: for an example)
+
+        - if false, the Magik compiler raises an error
+
+
+File: MagikLangRef.info,  Node: Special characters and keywords,  Prev: Variable declarations,  Up: Top
+
+Special characters and keywords
+*******************************
+
+This section lists all the special characters and keywords used in Smallworld
+Magik with references to where they are introduced.
+
+* Menu:
+
+* Special characters::
+* Keywords::
+
+
+File: MagikLangRef.info,  Node: Special characters,  Next: Keywords,  Up: Special characters and keywords
+
+Special characters
+==================
+
+A number of characters and sequences of characters have special meaning to the
+Magik compiler. They are collected here with, where relevant, references to a
+more detailed description.
+
+Character     Description                            See...
+---------------------------------------------------------------------------------- 
+( )           Round brackets are used to specify     *Note Expressions::
+              the order of evaluation of             *Note Lvalue tuples and rvalue tuples::
+              expressions and to denote rvalue       
+              tuples such as argument lists.         
+[ ]           Square brackets are used for indexing  *Note Indexing method invocation::
+              methods.                               *Note Method definitions::
+{ }           Curly brackets are delimiters for a    *Note Literals::
+              literal simple vector.                 
+#, ##         Introduce comments.                    *Note Comments::
+                                                     `Magik Language: Comments
+                                                     and comment style'
+.             Separates the integral and fractional  *Note Literals::
+              parts of a real number; used in        *Note Method and procedure invocation::
+              method invocation and direct slot      
+              access.                                
+,             Separates items in a list, such as an  *Note Lvalue tuples and rvalue tuples::
+              lvalue or rvalue tuple.                
+;             Separates multiple statements on the   *Note Simple statements::
+              same line.                             
+$             On a line by itself, identifies a      *Note Simple statements::
+              chunk of code for compilation.         
+:             The first character of a symbol.       *Note Symbols::
+              Separates the package qualifier and    *Note Identifiers such as labels and variables::
+              name in the full form of a global      
+              variable name.                         
+_             The first character of a keyword.      *Note Keywords and special values::
+                                                     *Note Keywords::
+\, ||         Used as a single character escape and  *Note Symbols::
+              as delimiters for non-standard         *Note Identifiers such as labels and variables::
+              characters in a symbol or identifier.  
+" "           Delimiters for a literal character     *Note Character strings::
+              string.                                
+%             Introduces a single literal character. *Note Characters::
+<<            The assignment operator. Operator      *Note Assignment::
+              assignments can be constructed with    *Note Operator assignment::
+              arithmetic operators, such as +<<,     
+              *<<.                                   
+^<<           The boot assignment operator.          *Note Boot assignment::
+>>            Introduces a results statement, used   *Note Blocks::
+              to return a value from a block body.   
+@             Introduces a label where this is       *Note Blocks::
+              optional, as in a procedure or block   *Note Procedure definitions::
+              definition. The syntax @<global        *Note Expressions::
+              variable name> is an expression which  
+              evaluates to the global variable.      
+!             By convention, used as the first and   *Note Dynamic declarations::
+              last character of a dynamic variable   *Note Identifiers such as labels and variables::
+              name and used to identify an internal  `Magik Language: Results
+              method name which cannot be classed    variables'
+              as strictly private. Used in results   `'
+              variables !, !_! and so on.            
+?, ??         By convention, used at the end of the  *Note Identifiers such as labels and variables::
+              names of methods returning a Boolean   
+              and Kleenean result respectively.      
+**, +, -, *,  Arithmetic operators.                  *Note Operators::
+/                                                    
+<, <=, >, >=  Relational operators.                  *Note Operators::
+=, <> (also   Equality operators.                    *Note Operators::
+~=)                                                  
+space, tab    May be required to terminate a         *Note Simple statements::
+              symbol, identifier or keyword; not     
+              otherwise significant.                 
+newline       Terminates a syntactically complete    *Note Simple statements::
+              statement or a comment, symbol,        
+              identifier or keyword; not otherwise   
+              significant.                           
+
+
+File: MagikLangRef.info,  Node: Keywords,  Prev: Special characters,  Up: Special characters and keywords
+
+Keywords
+========
+
+Here is a complete list of keywords with references to where they are
+introduced.
+
+Keyword   Description                             See...
+---------------------------------------------------------------------------------- 
+_abstract Introduces an abstract method; that     *Note Method definitions::
+          is, a method defined by a parent class  
+          which must be implemented by a          
+          subclass.                               
+_allresultsCollects multiple results from a        *Note Results from methods or procedures::
+          method or procedure invocation into a   
+          simple vector.                          
+_and      Boolean operator; result is true if     *Note Operators::
+          both operands are true.                 
+_andif    Boolean operator equivalent to _and     *Note Operators::
+          except that evaluation stops once the   
+          result is determined.                   
+_block    Introduces a block body.                *Note Blocks::
+_catch    Destination for transfer of control     *Note Catch and throw statements::
+          with a _throw statement. Can be         
+          labelled with an expression.            
+_clone    Within a method, refers to a copy of    *Note Receivers _self _super and _clone::
+          self (the current object).              
+_constant In a declaration, prevents              *Note Constants declarations::
+          reassignment to the variable after      
+          initialisation.                         
+_continue In a controlled or infinite loop,       *Note Loops::
+          terminates execution of one iteration   
+          of the loop.                            
+_div      Binary operator for integer division.   *Note Operators::
+_dynamic  Introduces variable declaration.        *Note Dynamic declarations::
+_elif     Introduces second and subsequent        *Note Conditionals::
+          condition in a conditional.             
+_else     Introduces final block body in a        *Note Conditionals::
+          conditional.                            
+_endblock Terminates _block statement.            *Note Blocks::
+_endcatch Terminates _catch statement.            *Note Catch and throw statements::
+_endif    Terminates _if statement.               *Note Conditionals::
+_endlock  Terminates _lock statement.             *Note Protect and lock statements::
+_endloop  Terminates _loop statement.             *Note Loops::
+_endmethodTerminates _method definition.          *Note Method definitions::
+_endproc  Terminates _proc definition.            *Note Procedure definitions::
+_endprotectTerminates _protect statement.          *Note Protect and lock statements::
+_endtry   Terminates _try statement.              *Note Try and handling statements::
+_false    Enumerated object with value false.     *Note Keywords and special values::
+_finally  Used in controlled loops.               *Note Controlled loops::
+_for      Introduces controlled loop.             *Note Controlled loops::
+_gather   In an lvalue tuple, collects all        *Note Lvalue tuples and rvalue tuples::
+          remaining values into a simple vector.  
+_global   Introduces variable declaration.        *Note Global declarations and the use of packages::
+_handling Introduces statement sequence for       *Note Try and handling statements::
+          handling a condition.                   
+_if       Introduces conditional.                 *Note Conditionals::
+_import   Used in variable declarations.          *Note Import declarations::
+                                                  *Note Dynamic import declarations::
+_is,      Identity operators.                     *Note Operators::
+_isnt                                             
+_iter     Introduces an iterator method or        *Note Defining iterator methods and procedures::
+          procedure definition.                   
+_leave    Terminates execution of a block or      *Note Leave statements::
+          loop.                                   
+_local    Introduces variable declaration.        *Note Local declarations::
+_lock     Introduces a _lock statement to gain    *Note Protect and lock statements::
+          exclusive access to an object.          
+_loop     Introduces the body of a loop.          *Note Loops::
+_loopbody()Used in an iterator method or           *Note Defining iterator methods and procedures::
+          procedure to yield values to a          
+          controlled loop.                        
+_maybe    Enumerated object with value maybe.     *Note Keywords and special values::
+_method   Introduces method definition.           *Note Method definitions::
+_mod      Remainder operator.                     *Note Operators::
+_no_way   Enumerated object with value no_way.    *Note Keywords and special values::
+_not      Unary boolean operator.                 *Note Operators::
+_optional In an argument list for a method or     *Note Argument lists::
+          procedure definition, introduces        
+          optional arguments.                     
+_or       Boolean operator; result is true if     *Note Operators::
+          either operand is true.                 
+_orif     Boolean operator equivalent to _or      *Note Operators::
+          except that evaluation stops once the   
+          result is determined.                   
+_over     Introduces iterator in controlled loop  *Note Controlled loops::
+          statement.                              
+_package  Used at the top level to define the     *Note Package statements::
+          current package.                        
+_pragma   Introduces classification of methods,   `Magik Language:
+          classes, global variables, shared       Classification of methods and
+          variables and so on.                    classes'
+_private  Introduces a private method definition. *Note Method definitions::
+_proc     Introduces a procedure definition.      *Note Procedure definitions::
+_protect  Introduces a protected block.           *Note Protect and lock statements::
+_protect  Introduces a protected block with a     *Note Protect and lock statements::
+_locking  lock.                                   
+_protectionIntroduces protection code, executed    *Note Protect and lock statements::
+          if a protected block is abandoned.      
+_recursiveUsed in a parallel variable             *Note Variable initialisation::
+          declaration to declare the variables    
+          recursively.                            
+_return   Introduces a _return statement,         *Note Returning results from a routine::
+          returning control from a method or      
+          procedure.                              
+_scatter  In an rvalue tuple, distributes a       *Note Lvalue tuples and rvalue tuples::
+          vector into individual values.          
+_self     Within a method, refers to the target   *Note Receivers _self _super and _clone::
+          object. Within a procedure, refers to   
+          the procedure.                          
+_super    Within a method, refers to a            *Note Receivers _self _super and _clone::
+          superclass of the target object.        
+_then     Introduces first condition in           *Note Conditionals::
+          conditional.                            
+_thisthreadThe current thread.                     `Magik Language: Threads for
+                                                  multi-tasking'
+_throw    Introduces a _throw statement to        *Note Catch and throw statements::
+          transfer control to a matching _catch   
+          statement.                              
+_true     Enumerated object with value true.      *Note Keywords and special values::
+_try      Introduces a statement sequence which   *Note Try and handling statements::
+          may give rise to particular             
+          conditions; the statements for          
+          handling a condition are introduced by  
+          _when.                                  
+_unset    Enumerated object with value unset.     *Note Keywords and special values::
+_when     Introduces a list of conditions which   *Note Try and handling statements::
+          may be raised by a _try statement.      
+_with     Introduces value or value list in       *Note Leave statements::
+          statements such as _leave, _throw,      *Note Catch and throw statements::
+          _handling.                              and so on
+_xor      Boolean operator; result is true if     *Note Operators::
+          either, but not both, operands are      
+          true.                                   
+
+
+Tag Table:
+Node: Top275
+Node: Syntactic elements2030
+Node: Comments2458
+Node: Literals2980
+Node: Integers3229
+Node: Real numbers4320
+Node: Characters5560
+Node: Character strings6175
+Node: Simple vectors6839
+Node: Symbols7769
+Node: Keywords and special values8960
+Node: Identifiers such as labels and variables10414
+Node: Labels11349
+Node: Method names11681
+Node: Package qualifiers in global variable names12838
+Node: Operators13609
+Node: Simple statements16559
+Node: Expressions assignment and invocation17725
+Node: Expressions18311
+Node: Lvalue tuples and rvalue tuples20803
+Node: Keywords _gather and _scatter22361
+Node: Keyword _allresults23586
+Node: Keyword _optional24501
+Node: Assignment25076
+Node: Simple assignment25451
+Node: Boot assignment26797
+Node: Operator assignment27413
+Node: Parallel assignment28226
+Node: Method and procedure invocation28930
+Node: Standard method invocation29415
+Node: Field access method invocation30481
+Node: Indexing method invocation31614
+Node: Chevron and boot-chevron method invocation32824
+Node: Access to instance variables34783
+Node: Procedure invocation36470
+Node: Results from methods or procedures37483
+Node: Using a method to invoke a routine39335
+Node: Compound statements41615
+Node: Blocks42420
+Node: Leave statements43639
+Node: Conditionals45062
+Node: Loops46534
+Node: Infinite loops47084
+Node: Controlled loops48029
+Node: Continue statements50903
+Node: Catch and throw statements51866
+Node: Protect and lock statements53314
+Node: Protect statements53626
+Node: Lock statements55470
+Node: Combining protect and lock statements56062
+Node: Try and handling statements56700
+Node: The _try statement57626
+Node: The _handling statement58700
+Node: Package statements60386
+Node: Defining procedures and methods62321
+Node: Introduction to defining procedures and methods63025
+Node: Procedure definitions64079
+Node: Method definitions65806
+Node: Standard method definitions66559
+Node: Field access method definitions68096
+Node: Indexing method definitions69140
+Node: Defining a private method70136
+Node: Defining an abstract method71273
+Node: Argument lists72249
+Node: Optional arguments73333
+Node: Gathered arguments74265
+Node: Optional and gathered arguments75072
+Node: Receivers _self _super and _clone75707
+Node: Returning results from a routine78012
+Node: Chevronned and boot-chevron forms of methods79748
+Node: Forms of standard methods80389
+Node: Forms of field access methods81151
+Node: Forms of indexing methods82082
+Node: Defining iterator methods and procedures82833
+Node: Classification and documentation of methods and procedures85147
+Node: Variable declarations86112
+Node: Introduction to variable declarations86832
+Node: Local declarations89861
+Node: Global declarations and the use of packages91120
+Node: Using packages92563
+Node: Action for undeclared variables94471
+Node: Dynamic declarations95605
+Node: Import declarations97841
+Node: Dynamic import declarations100123
+Node: Constants declarations101418
+Node: Variable initialisation102585
+Node: Sequential variable initialisation103194
+Node: Parallel variable initialisation103709
+Node: Recursive variable initialisation104777
+Node: Resolution of free variables105932
+Node: Special characters and keywords107124
+Node: Special characters107473
+Node: Keywords112477
+
+End Tag Table

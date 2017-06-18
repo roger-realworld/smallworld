@@ -1,0 +1,51 @@
+#% text_encoding = iso8859_1
+
+:|gis-version-help| :en_gb
+Select a Smallworld Core Product Installation.
+
+The product you select will define the environment for any new Smallworld
+sessions that `F2 z' runs.
+
+To make the selection, move the cursor to the line you want and press RETURN.
+
+Press q to exit and do nothing.
+
+:|gis-version-help-file-add|  :en_gb
+To add a new installation, press +.
+
+:|gis-version-none-selected|  :en_gb
+** There is no currently selected gis product.
+** (Attempting to run anyway).
+
+:|cb-header|  :en_gb
+    Smallworld Class Browser (Version 2.0)
+    --------------------------------------
+
+:|cb-gis-no-mf-file|  :en_gb
+*** Can't start the Class Browser. ***
+
+  The gis hasn't started a method_finder.
+  Perhaps there was no '.mf' file next to your image file.
+
+:|cb-topic-header|  :en_gb
+    CLASS BROWSER CONTROL PANEL : up to 200 methods normally displayed
+
+    PRAGMA FLAGS        INHERITANCE                    LAYOUT
+:|cb-topic-overrides|  :en_gb
+    OVERRIDES : use these for temporary changes to the control panel
+:|cb-topic-toggles|          :en_gb
+    TOPICS : use F3 t to turn all topics on/off
+
+:|mpde-available-configurations-help|  :en_gb
+* marks currently selected configuration
+x indicates configuration not available or misconfigured
+:|pragma-topic-selection| :en_gb
+T O P I C   S E L E C T I O N
+
+y or m - mark a line           n or u - unmark a line
+e      - edit the topic list
+SPC    - move down a line
+RET    - accept the selection
+q      - quit
+
+-----------------------------------------------

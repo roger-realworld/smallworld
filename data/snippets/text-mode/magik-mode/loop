@@ -1,0 +1,7 @@
+#name : loop ... endloop
+#group : control structure
+#contributor : Igor Lapitski <igor.lapitski@ge.com>
+# --
+_loop
+$>$0
+_endloop

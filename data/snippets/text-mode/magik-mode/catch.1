@@ -1,0 +1,9 @@
+#name : catch ... throw... endcatch
+#group : control structure
+#contributor : Igor Lapitski <igor.lapitski@ge.com>
+# --
+_catch ${1:<label>}
+$>$0
+_throw $1 _with ${2:<rvalue tuple>}
+$>
+_endcatch #$1

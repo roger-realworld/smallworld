@@ -1,0 +1,7 @@
+#name : proc... endproc
+#group : control structure
+#contributor : Igor Lapitski <igor.lapitski@ge.com>
+# --
+_proc ${1:<args>}
+$>$0
+_endproc

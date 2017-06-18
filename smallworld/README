@@ -1,0 +1,19 @@
+This directory contains the Smallworld Lisp extensions to GNU Emacs.
+
+To regenerate the `.elc' files from the `.el' files, do the following:
+
+  - setenv your EMACSLOADPATH to this directory followed by the emacs main
+    lisp directory like this:  setenv EMACSLOADPATH dir1:dir2
+
+  - batch byte compile the `.el' files:
+    emacs -L . -batch -f batch-byte-compile *.el
+
+The following files should not be byte-compiled:
+
+    load_sw_defs.el
+    load_sw_development.el
+    mpde-boot.el
+    require_sw_defs.el
+    require_sw_development.el
+    subdirs.el
+    sw-autoload.el

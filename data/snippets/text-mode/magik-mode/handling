@@ -1,0 +1,5 @@
+#name : handling... with...
+#group : control structure
+#contributor : Igor Lapitski <igor.lapitski@ge.com>
+# --
+$>_handling ${1:<name list>} _with ${2:<procedure>}

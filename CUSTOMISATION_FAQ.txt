@@ -1,0 +1,38 @@
+-------------------------------------------------------------
+Customisations should be added to your .emacs file in your home directory.
+To create a .emacs use Emacs to open a file called "~/.emacs".
+The ~ directory is shorthand for your HOME directory.
+
+For example customisations look at the default Smallworld customisations
+in "sw_defaults.el", "occasional.emacs" and "developer.emacs".
+These are available from the SW->Customise submenu.
+-------------------------------------------------------------
+
+Emacs maintainers:
+-----------------
+
+A "local" subdirectory structure is provided for addition of local
+site packages.  This is empty except for a subdirs.el file and is
+structured to appear first in the load-path, to allow for overrides
+and newer versions of the shipped packages.  This is useful if you
+maintain a central shared Emacs installation. See README file.
+
+Additional generic configuration/setup code can be placed
+in default.el or in site-start.el.
+
+If you must use site-start.el, note that users have much less
+control over their Emacs environment. I use site-start.el to
+preconfigure certain variables but not to load packages.
+
+For example, I configure M-x mail to be able to work using the
+local SMTP mail environment. This is for site-start.el since it is
+unlikely to be different for different users in an organisation and
+because the configuration itself only consists of setting
+variables, users can still have the opportunity to override the
+settings in their .emacs.
+
+I recommend that you should carefully consider whether you actually
+*enable* extra functionality by default since it may be quite
+difficult for your users to disable it if it is a feature that they
+do not like.  This makes it easier for users to be able to control
+the customisations in their Emacs session.

@@ -1,0 +1,9 @@
+#name : protect... protection... endprotect
+#group : control structure
+#contributor : Igor Lapitski <igor.lapitski@ge.com>
+# --
+_protect
+$>$0
+_protection
+
+_endprotect

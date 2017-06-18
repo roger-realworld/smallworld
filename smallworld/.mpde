@@ -1,0 +1,31 @@
+;;This file is used as a template for the mpde-configuration-file used by mpde.
+;;The code contained here is to make it so that the user need only
+;;load their version of this file and it will then load MPDE and configure it.
+;;When users define their own configurations, this data will be appended to their copy
+;;of this file.
+
+;; The main thing that needs to be considered is where does the user want
+;; load-path to pick up the code from?
+;; Ideally this should always be in the following preference:
+;;
+;;     Master   then
+;;     current MPDE configuration then
+;;     Emacs site lisp (if a local install)
+;;
+;; In practice however, with MPDE loaded, the site-lisp directory of a
+;; local installation will NEVER be accessed.
+;;
+;; But, if the user ever needs to use Emacs' local install site lisp
+;; then they simply comment out the loading of their copy of this file
+;; from their .emacs file.
+
+;; Record that MPDE has been installed.
+(setq mpde-boot-installed load-file-name)
+
+;; Load MPDE Bootstrap code
+(load "~/mpde-boot")
+
+;; Setup up user interaction after this file is loaded.
+(eval-after-load "~/.mpde" '(mpde-boot-after-load))
+
+;; New configuration definitions are appended to this file

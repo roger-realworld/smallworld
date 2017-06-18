@@ -1,0 +1,8 @@
+#name : for... over... loop... endloop
+#group : control structure
+#contributor : Igor Lapitski <igor.lapitski@ge.com>
+# --
+_for ${1:<lvalue,tuple>} _over ${2:<iter invocation>}
+_loop
+$>$0
+_endloop

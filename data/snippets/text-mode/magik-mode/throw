@@ -1,0 +1,5 @@
+#name : throw... with...
+#group : control structure
+#contributor : Igor Lapitski <igor.lapitski@ge.com>
+# --
+$>_throw ${1:<expression>} _with ${2:<rvalue tuple>}

@@ -1,0 +1,7 @@
+#name : elif ...
+#group : control structure
+#contributor : Igor Lapitski <igor.lapitski@ge.com>
+# --
+_elif ${1:<condition>}
+_then
+$0$>

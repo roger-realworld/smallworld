@@ -1,0 +1,7 @@
+The en_us messages simply contain those messages that are different to
+the en_gb messages.
+
+To configure Emacs to use the en_us messages:
+	(setq resources-languages '("en_us" "en_gb"))
+
+

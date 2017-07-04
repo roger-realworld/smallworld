@@ -110,28 +110,6 @@ propagated to the original buffer." t)
 (tool-bar-add-item (if (running-under-nt) "shell_windows" "shell_unix") 'shell 'shell
 		   :help "Start a Shell in a buffer")
 
-(defvar site-lisp-dir
-  (file-name-directory (locate-library "site-start.el" t)))
-(defvar site-lisp-features-dir
-  (file-name-as-directory (concat site-lisp-dir "features")))
-(defvar site-lisp-data-dir
-  (file-name-as-directory (concat site-lisp-dir "data")))
-;; Setup YASNIPPET
-(let ((yas-load-path (locate-library "yasnippet.elc" t)))
-  (if yas-load-path
-      (progn
-	(custom-initialize-set 'yas/global-mode t)
-	(require 'yasnippet)
-	(setq yas/use-menu 'abbreviate
-	      yas/root-directory
-	      (append
-	       (list (concat site-lisp-data-dir "snippets"))
-	       (if (stringp 'yas/root-directory)
-		   (list yas/root-directory)
-		 yas/root-directory)))
-	(if yas/global-mode (yas/global-mode 1)))))
-;;	(yas/reload-all)
-
 ;; Tabbar mode
 (eval-if (locate-library "tabbar.elc" t)
     (custom-initialize-set 'tabbar-mode t)

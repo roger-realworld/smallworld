@@ -1,8 +1,0 @@
-#name : over... loop... endloop
-#group : control structure
-#contributor : Igor Lapitski <igor.lapitski@ge.com>
-# --
-_over ${1:<range params>}
-_loop ${2:<@identifier>}
-$>$0
-_endloop #$2

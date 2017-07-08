@@ -1,7 +1,0 @@
-#name : catch ... endcatch
-#group : control structure
-#contributor : Igor Lapitski <igor.lapitski@ge.com>
-# --
-_catch ${1:<label>}
-$>$0
-_endcatch #$1

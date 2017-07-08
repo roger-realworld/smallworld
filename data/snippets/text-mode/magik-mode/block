@@ -1,7 +1,0 @@
-#name : block ... endblock
-#group : control structure
-#contributor : Igor Lapitski <igor.lapitski@ge.com>
-# --
-_block ${1:<@label>}
-$>$0
-_endblock #$1

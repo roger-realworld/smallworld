@@ -1,6 +1,0 @@
-#name : define_shared_constant...
-#group : definitions
-#contributor : Igor Lapitski <igor.lapitski@ge.com>
-# --
-
-`(electric-magik-insert-template-lig "define_shared_constant")`

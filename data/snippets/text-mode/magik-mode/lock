@@ -1,7 +1,0 @@
-#name : lock... endlock
-#group : control structure
-#contributor : Igor Lapitski <igor.lapitski@ge.com>
-# --
-_lock ${1:<expression>}
-$>$0
-_endlock

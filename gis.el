@@ -1053,6 +1053,7 @@ Else (not in any cmd.) recall line."
           (delete-region (point) (point-max))
           (send-gis-region (marker-position p) (point)))
          ((complete-magik-p p (point))
+          (insert "$\n")
           (delete-region (point) (point-max))
           (send-gis-region (marker-position p) (point)))))
        ((looking-at "[ \t\n]*\\$[ \t\n]*\\'")

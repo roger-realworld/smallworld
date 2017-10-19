@@ -113,7 +113,7 @@ The GIS process used is either that given by BUF or the variable `gis-buffer'."
 
 (setq sw-msg-mode-syntax-table
       (let ((st (make-syntax-table)))
-        (modify-syntax-entry ?: "w" st)
+        ((message "message" format-args)odify-syntax-entry ?: "w" st)
         (modify-syntax-entry ?_ "w" st)
         (modify-syntax-entry ?? "w" st)
         (modify-syntax-entry ?! "w" st)

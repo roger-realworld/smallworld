@@ -1,5 +1,7 @@
 ;;; sw-loadlis-mode.el -- mode for editing Magik load_list.txt files.
 
+(require 'gis)
+
 (defgroup sw-loadlist nil
   "Customise Magik load_list.txt files group."
   :group 'smallworld
@@ -29,7 +31,7 @@ Intial ^ and final $ is automatically added in `loadlist-ignore'."
 (define-derived-mode sw-loadlist-mode prog-mode "sw-loadlist"
     "Major mode for editing Magik load_list.txt files."
 
-  :group 'loadlist
+  :group 'smallworld
   (setq font-lock-defaults sw-loadlist-mode-font-lock-defaults))
 
 
@@ -39,6 +41,40 @@ Regexp does not need to include ^ or $."
   (loop for r in sw-loadlist-ignore-regexp-list
 	for match = (string-match (concat "^" r "$") file)
 	if match return t))
+
+(defun sw-loadlist-buffer-list ()
+  "Return contents of loadlist buffer."
+  (goto-char (point-min))
+  (let (start
+	contents file)
+    (while (not (eobp))
+      (skip-syntax-forward "-")
+      (if (eq (following-char) ?#)
+	  (forward-line)
+	(setq start (point))
+	(if (search-forward "#" (point-eol) t)
+	    (backward-char)
+	  (end-of-line))
+	(skip-syntax-backward "-")
+	(setq file (buffer-substring-no-properties start (point)))
+	(cond ((equal file "")
+	       (setq file nil))
+	      ((eq (substring file -1) ?\\)
+	       (aset file (1- (length file)) ?/))
+	      ((and (> (length file) 5)
+		    (equal (substring file -6) ".magik"))
+	       (setq file (substring file 0 (- (length file) 6))))
+	      (t nil))
+	(if file (push (sw-loadlist-file-data file (point-bol)) contents))
+	(forward-line)))
+    contents))
+
+(defun sw-loadlist-file-data (file &optional data)
+  "Return list of data describing FILE."
+  (let ((lc (downcase file)))
+    (list lc
+	  (if (equal file lc) nil file) ;used to check for case differences for UNIX
+	  data)))
 
 
 (defun sw-loadlist-directory-list (&optional dir)
@@ -50,16 +86,16 @@ Regexp does not need to include ^ or $."
     (save-match-data
       (loop for a in contents
 	    for f = (car a)
-	    if (loadlist-ignore f)
+	    if (sw-loadlist-ignore f)
 	      do (progn
 		   (princ (format resources-loadlist-output-ignored f))
 		   (princ "\n"))
 	    else if (string-match "\\.magik$" f) ; a .magik file
-	      do (push (loadlist-file-data
+	      do (push (sw-loadlist-file-data
 			(substring f 0 (- (length f) 6)))
 		       files)
 	    else if (cadr a) ; a subdirectory
-	      do (push (loadlist-file-data (concat f "/")) files)
+	      do (push (sw-loadlist-file-data (concat f "/")) files)
 	    end)
       files)))
 
@@ -73,12 +109,12 @@ With a prefix arg accept all changes without prompting."
   ;;Do not bother prompting if buffer is empty.
   (if (zerop (buffer-size)) (setq arg t))
 
-  (let ((buflist (loadlist-buffer-list))
+  (let ((buflist (sw-loadlist-buffer-list))
 	updated
 	buf-i
 	newlist)
     (with-output-to-temp-buffer "*loadlist changes*"
-      (dolist (i (loadlist-directory-list dir))
+      (dolist (i (sw-loadlist-directory-list dir))
 	(cond ((setq buf-i (assoc (elt i 0) buflist))
 	       (let ((real-file    (elt i 1))
 		     (replace-file (or (elt i 1) (elt i 0)))

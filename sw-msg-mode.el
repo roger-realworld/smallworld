@@ -112,16 +112,16 @@ The GIS process used is either that given by BUF or the variable `gis-buffer'."
 (defvar sw-msg-mode-syntax-table nil "Syntax for SW message mode.")
 
 (setq sw-msg-mode-syntax-table
-  (let ((st (make-syntax-table)))
-    (modify-syntax-entry ?: "w" st)
-    (modify-syntax-entry ?_ "w" st)
-    (modify-syntax-entry ?? "w" st)
-    (modify-syntax-entry ?! "w" st)
-    ;; multi quote
-    (modify-syntax-entry ?| "$" st)
-    ;; variable intro
-    (modify-syntax-entry ?# "/" st)
-    st))
+      (let ((st (make-syntax-table)))
+        (modify-syntax-entry ?: "w" st)
+        (modify-syntax-entry ?_ "w" st)
+        (modify-syntax-entry ?? "w" st)
+        (modify-syntax-entry ?! "w" st)
+        ;; multi quote
+        (modify-syntax-entry ?| "$" st)
+        ;; variable intro
+        (modify-syntax-entry ?# "/" st)
+        st))
 
 ;; Imenu configuration
 (defvar msg-imenu-generic-expression

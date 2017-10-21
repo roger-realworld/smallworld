@@ -1,6 +1,10 @@
 ;;; sw-aliases.el -- mode for editing GIS sw-aliases files.
+;;; Commentary:
+;;; Code:
 
-(require 'resources)
+(defvar gis-exec-path)
+(defvar gis-process-environment)
+(defvar gis-current-command)
 
 (defcustom sw-aliases-user-file-list '("$HOME/gis_aliases")
   "A list of a User's personal gis_aliases files."
@@ -11,7 +15,7 @@
   "*List of common gis_aliases files.
 This list is expected to be setup by the Emacs maintainer,
 a user can setup their personal gis_aliases file list using
-`aliases-user-file-list'. Both these lists are concatenated to
+`aliases-user-file-list'.  Both these lists are concatenated to
 form the top section of the SW->Alias Files submenu."
   :group 'aliases
   :type  '(repeat file))
@@ -32,7 +36,7 @@ form the top section of the SW->Alias Files submenu."
 				    '("../bin/x86" "../../product/bin/x86")
 				  '("../bin/share" "../../product/bin/share"))
   "*Path to `aliases-program'.
-Setting this sets the default value. When opening a gis_aliases file,
+Setting this sets the default value.  When opening a gis_aliases file,
 the buffer local value of this variable will be set to the directory
 containing the `aliases-program' if it is in a relative path to the file."
   :group 'aliases
@@ -72,18 +76,8 @@ If any function returns t, then the buffer is displayed."
 (defvar sw-aliases-menu nil
   "Menu for sw-aliases mode.")
 
-(easy-menu-define sw-aliases-menu sw-aliases-mode-map
-  "Menu for sw-aliases mode."
-  `(,resources-aliases-menu
-    [,resources-aliases-menu-run-gis  sw-aliases-run-program t]
-    "----"
-    (,resources-aliases-menu-definitions)
-    "---"
-    [,resources-menu-sw-customize     sw-aliases-customize   t]
-    [,resources-menu-sw-help          sw-aliases-help        t]))
-
 (defvar sw-aliases-definition-regexp "^\\([^#]\\S-+\\):\\s-*$"
-  "Regexp matching an alias definition")
+  "Regexp matching an alias definition.")
 
 ;; Imenu configuration
 (defvar sw-aliases-imenu-generic-expression
@@ -107,11 +101,6 @@ If any function returns t, then the buffer is displayed."
 
 (defvar sw-aliases-process-environment nil
   "Stored `process-environment' for executing GIS command.")
-
-(defun sw-aliases-help ()
-  "Display help on how to use the sw-aliases Mode interface."
-  (interactive)
-  (sw-help-open sw-help-aliases-id))
 
 (defun sw-aliases-customize ()
   "Open Customization buffer for sw-aliases Mode."
@@ -142,20 +131,18 @@ If any function returns t, then the buffer is displayed."
     list))
 
 (defun sw-aliases-switch-to-buffer (alias)
-  "Return t, to switch to the buffer that the GIS.exe process is running in.
+  "Switch to the buffer that the GIS.exe process is running in with ALIAS.
 Since some entries in the sw-aliases file do not start a Smallworld Magik GIS
 process we do not necessarily want to switch to the buffer running the
-process all the time. These are the following methods by which we control
+process all the time.  These are the following methods by which we control
 when the buffer is displayed:
-  Hook: `aliases-switch-to-buffer-hooks'
-       Each function in the hook is passed the name of the alias.
-       If any function returns t, then the buffer is displayed.
-  Regexp: `aliases-switch-to-buffer-regexp'
-       If the alias name matches the given regular expression the buffer
-       is displayed.
-  Variable: `aliases-switch-to-buffer'
-       If this is t then the buffer is displayed.
-"
+Hook: `aliases-switch-to-buffer-hooks'
+Each function in the hook is passed the name of the alias.
+If any function returns t, then the buffer is displayed.
+Regexp: `aliases-switch-to-buffer-regexp'
+If the alias name matches the given regular expression the buffer is displayed.
+Variable: `aliases-switch-to-buffer'
+If this is t then the buffer is displayed."
   (cond ((run-hook-with-args-until-success 'aliases-switch-to-buffer-hooks alias)
 	 t)
 	((stringp sw-aliases-switch-to-buffer-regexp)
@@ -165,7 +152,7 @@ when the buffer is displayed:
 	 sw-aliases-switch-to-buffer)))
 
 (defun sw-aliases-program-set (&optional default)
-  "Return the program to use to operate on a gis_aliases file."
+  "Return the program (DEFAULT) to use to operate on a gis_aliases file."
   (let ((path sw-aliases-program-path)
 	finished program)
     (while path
@@ -178,7 +165,7 @@ when the buffer is displayed:
     (or program default)))
 
 (defun sw-aliases-run-program (&optional alias file dir)
-  "Run gis.exe on the sw-aliases file.
+  "Run ALIAS using gis.exe on the sw-aliases file FILE in DIR.
 
 With a prefix arg, ask user for current directory to use."
   (interactive (if (not (sw-aliases-at-alias-definition))
@@ -210,10 +197,10 @@ With a prefix arg, ask user for current directory to use."
 	     (setq alias (match-string-no-properties 1)))
 	    (t
 	     (error resources-aliases-no-definition)))
-      (if (running-under-nt)
+      (if (eq system-type 'windows-nt)
 	  (if (file-exists-p (concat (file-name-directory file) "environment.bat"))
 	      (setq args (append args (list "-e" (concat (file-name-directory file) "environment.bat")) nil))))
-      (setq args (append args (list "-a" file alias) nil)) ;; alias name MUST be last 
+      (setq args (append args (list "-a" file alias) nil)) ;; alias name MUST be last
 
       (if (stringp version)
 	  (setq buf (concat buf " " version)))
@@ -262,10 +249,9 @@ Returns nil if FILE cannot be expanded."
 (defun sw-aliases-layered-products-file (file)
   "Read contents of FILE with the format of LAYERED_PRODUCTS configuration file."
   (if (file-exists-p file)
-      (save-excursion
-	(set-buffer (get-buffer-create " *aliases LAYERED_PRODUCTS*"))
+      (with-current-buffer " *aliases LAYERED_PRODUCTS*"
 	(insert-file-contents file nil nil nil 'replace)
-
+	
 	;; Always ensure that a default sw_core: set to SMALLWORLD_GIS is present
 	;; in case the value has been manually modified but we still wish to locate
 	;; a gis_aliases file next to the LAYERED_PRODUCTS file.
@@ -329,7 +315,7 @@ Returns nil if FILE cannot be expanded."
 	(when (getenv "SMALLWORLD_GIS")
 	  (dolist (lp (sw-aliases-layered-products-file
 		       (sw-aliases-expand-file "$SMALLWORLD_GIS/../smallworld_registry/LAYERED_PRODUCTS")))
-	    (push `[,(format "%s: %s" (car lp) (cdr lp)) 
+	    (push `[,(format "%s: %s" (car lp) (cdr lp))
 		    (progn
 		      (find-file ,(concat (cdr lp) "/config/gis_aliases"))
 		      (sw-aliases-mode))
@@ -367,5 +353,4 @@ Returns nil if FILE cannot be expanded."
 
 (provide 'sw-aliases-mode)
 
-
-;;; sw-aliases-ode.el ends here
+;;; sw-aliases-mode.el ends here

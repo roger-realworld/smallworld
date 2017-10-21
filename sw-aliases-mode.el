@@ -2,9 +2,16 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'cl-lib)
+(autoload 'gis-mode "gis")
+(autoload 'gis-start-process "gis")
+(autoload 'sw-buffer-mode-list "utils-sw")
+(autoload 'gis-version-current "gis-version")
+ 
 (defvar gis-exec-path)
 (defvar gis-process-environment)
 (defvar gis-current-command)
+(defvar gis-version-current)
 
 (defcustom sw-aliases-user-file-list '("$HOME/gis_aliases")
   "A list of a User's personal gis_aliases files."
@@ -68,23 +75,13 @@ If any function returns t, then the buffer is displayed."
   :type  'hook)
 
 (defvar sw-aliases-mode-map (make-sparse-keymap)
-  "Keymap for GIS sw-aliases files")
+  "Keymap for GIS sw-aliases files.")
 
 (define-key sw-aliases-mode-map [f1]   'aliases-help)
 (define-key sw-aliases-mode-map "\C-c" 'aliases-run-program)
 
-(defvar sw-aliases-menu nil
-  "Menu for sw-aliases mode.")
-
 (defvar sw-aliases-definition-regexp "^\\([^#]\\S-+\\):\\s-*$"
   "Regexp matching an alias definition.")
-
-;; Imenu configuration
-(defvar sw-aliases-imenu-generic-expression
-  (list
-   (list nil sw-aliases-definition-regexp 1)
-    )
-  "Imenu generic expression for sw-aliases mode.  See `imenu-generic-expression'.")
 
 ;; Font-lock configuration
 (defvar sw-aliases-mode-font-lock-defaults
@@ -131,13 +128,16 @@ If any function returns t, then the buffer is displayed."
     list))
 
 (defun sw-aliases-switch-to-buffer (alias)
-  "Switch to the buffer that the GIS.exe process is running in with ALIAS.
+  "Return true to switch to the GIS buffer.
+If true switches to the buffer that ALIAS is running in.
 Since some entries in the sw-aliases file do not start a Smallworld Magik GIS
 process we do not necessarily want to switch to the buffer running the
 process all the time.  These are the following methods by which we control
 when the buffer is displayed:
+
 Hook: `aliases-switch-to-buffer-hooks'
 Each function in the hook is passed the name of the alias.
+
 If any function returns t, then the buffer is displayed.
 Regexp: `aliases-switch-to-buffer-regexp'
 If the alias name matches the given regular expression the buffer is displayed.
@@ -152,7 +152,9 @@ If this is t then the buffer is displayed."
 	 sw-aliases-switch-to-buffer)))
 
 (defun sw-aliases-program-set (&optional default)
+
   "Return the program (DEFAULT) to use to operate on a gis_aliases file."
+
   (let ((path sw-aliases-program-path)
 	finished program)
     (while path
@@ -170,7 +172,7 @@ If this is t then the buffer is displayed."
 With a prefix arg, ask user for current directory to use."
   (interactive (if (not (sw-aliases-at-alias-definition))
 		   (list
-		    (completing-read (concat resources-aliases-definition-prompt " ")
+		    (completing-read (concat "Definition:" " ")
 				     (mapcar (function
 					      (lambda (d) (cons d d)))
 					     (sw-aliases-list))
@@ -179,7 +181,7 @@ With a prefix arg, ask user for current directory to use."
   (cond (current-prefix-arg
 	 (setq dir (file-name-as-directory
 		    (expand-file-name
-		     (read-file-name (concat resources-aliases-cwd-prompt " "))))))
+		     (read-file-name (concat "Set current working directory" " "))))))
 	((null dir)
 	 (setq dir default-directory)))
 
@@ -196,7 +198,7 @@ With a prefix arg, ask user for current directory to use."
 	    ((re-search-backward sw-aliases-definition-regexp nil t)
 	     (setq alias (match-string-no-properties 1)))
 	    (t
-	     (error resources-aliases-no-definition)))
+	     (error "Cannot find any alias definitions")))
       (if (eq system-type 'windows-nt)
 	  (if (file-exists-p (concat (file-name-directory file) "environment.bat"))
 	      (setq args (append args (list "-e" (concat (file-name-directory file) "environment.bat")) nil))))
@@ -210,17 +212,17 @@ With a prefix arg, ask user for current directory to use."
       (set-buffer buf)
       (gis-mode)
       
-      (insert resources-aliases-command ": " program " ")
+      (insert "Command" ": " program " ")
       (mapc (function (lambda (s) (insert s " "))) args)
       (setq default-directory dir
 	    args (append (list program) args)
-	    gis-exec-path (copy-list (or exec-path-aliases exec-path))
-	    gis-process-environment (copy-list (or process-environment-aliases process-environment))
+	    gis-exec-path (cl-copy-list (or exec-path-aliases exec-path))
+	    gis-process-environment (cl-copy-list (or process-environment-aliases process-environment))
 	    gis-current-command (mapconcat 'identity args " "))
       (if (stringp version)
 	  (set 'gis-version-current version))
 	    
-      (insert "\n" (format resources-aliases-cwd default-directory) "\n\n")
+      (insert "\n" (format "Cwd is: %s" default-directory) "\n\n")
       (gis-start-process args))
     (if (sw-aliases-switch-to-buffer alias)
 	(switch-to-buffer buf))))
@@ -291,9 +293,9 @@ Returns nil if FILE cannot be expanded."
 	  (setq def (car sw-aliases)
 		sw-aliases (cdr sw-aliases))
 	  (push (vector def (list 'aliases-run-program def) t) entries)) ;; :key-sequence nil
-	(easy-menu-change (list resources-aliases-menu)
-			  resources-aliases-menu-definitions
-			  (or entries (list resources-aliases-menu-none-found))))))
+	(easy-menu-change (list "Aliases")
+			  "Definitions"
+			  (or entries (list "No Aliases found"))))))
 
 (defun sw-aliases-update-sw-menu ()
   "Update 'resources-menu-sw-alias-files' submenu in SW menu bar."
@@ -302,7 +304,7 @@ Returns nil if FILE cannot be expanded."
       (let (default-files
 	    lp-files
 	    buffers
-	    (rescan (list "---" (vector resources-aliases-sw-menu-rescan 'aliases-update-sw-menu t))))
+	    (rescan (list "---" (vector "*Rescan*" 'aliases-update-sw-menu t))))
 	(dolist (f (append sw-aliases-user-file-list sw-aliases-common-file-list ))
 	  (push `[,f
 		  (progn
@@ -324,15 +326,11 @@ Returns nil if FILE cannot be expanded."
 		  lp-files))
 	  (push "---" lp-files))
 
-	(loop for buf in (sw-buffer-mode-list 'aliases-mode)
+	(cl-loop for buf in (sw-buffer-mode-list 'aliases-mode)
 	      do (push (vector (buffer-file-name (get-buffer buf))
 			       (list 'switch-to-buffer buf)
 			       t) buffers))
-	(or (eq (length buffers) 0) (push "---" buffers))
-
-	(easy-menu-change (list resources-menu-sw)
-			  resources-menu-sw-alias-files
-			  (append default-files lp-files buffers rescan)))))
+	(or (eq (length buffers) 0) (push "---" buffers)))))
   
 (defvar sw-aliases-mode-syntax-table nil "Syntax for SW sw-aliases mode.")
 

@@ -1,6 +1,7 @@
 ;;; sw-aliases.el -- mode for editing GIS sw-aliases files.
 ;;; Commentary:
 ;;; Code:
+
 (require 'cl-lib)
 (autoload 'gis-mode "gis")
 (autoload 'gis-start-process "gis")
@@ -133,8 +134,10 @@ Since some entries in the sw-aliases file do not start a Smallworld Magik GIS
 process we do not necessarily want to switch to the buffer running the
 process all the time.  These are the following methods by which we control
 when the buffer is displayed:
-Hook: `aliases-switch-to-buffer-hooks' Each function in the hook is
-passed the name of the alias.
+
+Hook: `aliases-switch-to-buffer-hooks'
+Each function in the hook is passed the name of the alias.
+
 If any function returns t, then the buffer is displayed.
 Regexp: `aliases-switch-to-buffer-regexp'
 If the alias name matches the given regular expression the buffer is displayed.
@@ -149,7 +152,9 @@ If this is t then the buffer is displayed."
 	 sw-aliases-switch-to-buffer)))
 
 (defun sw-aliases-program-set (&optional default)
-  "Return the program (default DEFAULT) to use to operate on a gis_aliases file."
+
+  "Return the program (DEFAULT) to use to operate on a gis_aliases file."
+
   (let ((path sw-aliases-program-path)
 	finished program)
     (while path
@@ -162,7 +167,7 @@ If this is t then the buffer is displayed."
     (or program default)))
 
 (defun sw-aliases-run-program (&optional alias file dir)
-  "Run gis.exe on ALIAS from sw-aliases (FILE) in DIR.
+  "Run ALIAS using gis.exe on the sw-aliases file FILE in DIR.
 
 With a prefix arg, ask user for current directory to use."
   (interactive (if (not (sw-aliases-at-alias-definition))
@@ -345,6 +350,5 @@ Returns nil if FILE cannot be expanded."
     (push '("aliases.txt$" . sw-aliases-mode) auto-mode-alist))
 
 (provide 'sw-aliases-mode)
-
 
 ;;; sw-aliases-mode.el ends here

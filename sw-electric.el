@@ -1,4 +1,6 @@
 ;;; sw-electric.el -- inserting magik templates etc.
+;;; Commentary:
+;;; Code:
 
 (eval-when-compile
   (require 'cl)
@@ -49,7 +51,8 @@
      ("condition.define_condition(:" ",\n\t:,\n\t{})\n" dollar))
     ("define_binary_operator_case" -1 1 (prev_pragma "_pragma(classify_level=, topic={}, usage={})")
      (prev_class_name "define_binary_operator_case(:" ",\n\t## \n\t## \n\t## \n\t)\n" dollar)))
-  " These 'method' templates automatically insert the class name at the front.")
+  "These 'method' templates automatically insert the class name at the front.")
+
 (defvar magik-electric-templates
   (append
    '(("iter" e 1 (prev_pragma "_pragma(classify_level=, topic={},
@@ -79,7 +82,7 @@ usage={})") ("_iter _method " prev_class_name) "\t## " "\t## " -
   "*An association list of magik templates.")
 
 (defun electric-magik-mode (&optional arg)
-  "Toggle the electric switch."
+  "Toggle the electric switch, optionally with ARG."
   (interactive)
   (setq electric-magik-mode
 	(if (null arg)
@@ -88,11 +91,14 @@ usage={})") ("_iter _method " prev_class_name) "\t## " "\t## " -
   (message (if electric-magik-mode
                resources-magik-electric-on
              resources-magik-electric-off)))
+
 (defalias 'electric-magik-toggle 'electric-magik-mode) ;compatibility
 
 (defun electric-magik-hash (arg)
-  "insert the char, `#', and if this is the first `#' on the line and
-the previous line starts with a `#' align with that."
+  "Insert a hash.
+If this is the first hash on the line and
+the previous line starts with a hash align with that.
+Use ARG."
   (interactive "*p")
   (self-insert-command arg)
   (if (save-excursion
@@ -119,7 +125,7 @@ the previous line starts with a `#' align with that."
   (explicit-electric-magik-space))
 
 (defun explicit-electric-magik-space ()
-  "insert magik programming templates"
+  "Insert magik programming templates."
   (interactive "*")
   (let*
       ((p (point))
@@ -156,7 +162,8 @@ the previous line starts with a `#' align with that."
       (error resources-magik-electric-no-template-error str))))
 
 (defun electric-magik-space (arg &optional doit)
-  "expand magik keywords into programming templates"
+  "Expand magik keywords into programming templates.
+Use ARG and DOIT."
   (interactive "*p")
     (cond
      ((save-excursion
@@ -227,7 +234,8 @@ the previous line starts with a `#' align with that."
 	   (forward-char x)))))
 
 (defun electric-insert-template-line (name line col)
-  "Interpret one line of the electric template."
+  "Interpret one line of the electric template.
+Use NAME, LINE and COL"
   (if (and (listp line)
 	   (not (eq (car line) 'prev_pragma)))
       ;;RECURSIVE
@@ -235,7 +243,7 @@ the previous line starts with a `#' align with that."
         (electric-insert-template-line name x col))
     (run-hook-with-args 'electric-insert-template-line-pre-hook name line col)
     (cond
-     ((and (listp line) 
+     ((and (listp line)
 	   (eq (car line) 'prev_pragma))
       (if (save-excursion
 	    (re-search-backward "^_pragma([^)]*)" nil t))

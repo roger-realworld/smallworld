@@ -18,22 +18,10 @@
   (defvar gis-prompt)
   )
 
-(require 'pragma)
-
-(defgroup magik nil
-  "Customise Magik Language group."
-  :group 'smallworld
-  :group 'languages)
-
-(defconst magik-version "$Revision: 1.58 $")
-
-(defcustom magik-mode-hook nil
-  "*Hook to run after Magik mode is set."
-  :group 'magik
-  :type  'hook)
+(require 'sw-pragma)
 
 (defcustom transmit-magik-debug-p nil
-  "*If t, \"#DEBUG\" patterns get stripped out of things being transmitted to magik"
+  "*If t, \"#DEBUG\" patterns get stripped out of things being transmitted to magik."
   :group 'magik
   :type  'boolean)
 
@@ -46,7 +34,7 @@
   "*If t, `magik-mark-method' (\\[magik-mark-method]) leaves point at end of marked method region.
 nil leaves point at start of marked method region.
 Standard Emacs marking commands like `mark-paragraph' and `mark-sexp'
-(on keys \\[mark-paragraph] and \\[mark-sexp] respectively)
+\(on keys \\[mark-paragraph] and \\[mark-sexp] respectively)
 normally leave point at the start of the region.
 But to keep most users happy, this is defaulted to t as this is
 what most Smallworld users expect.
@@ -60,7 +48,7 @@ Users can also swap the point and mark positions using \\[exchange-point-and-mar
   :type  'string)
 
 (defcustom magik-auto-abbrevs t
-  "*User option which enables magik abbreviation expansion automatically"
+  "*User option which enables magik abbreviation expansion automatically."
   :group 'magik
   :type  'boolean)
 
@@ -70,86 +58,13 @@ Users can also swap the point and mark positions using \\[exchange-point-and-mar
   :type  'integer)
 
 (defvar magik-mode-map (make-sparse-keymap)
-  "Keymap for Magik files")
+  "Keymap for Magik files.")
 
 (defvar magik-menu nil
-  "Keymap for the Magik buffer menu bar")
+  "Keymap for the Magik buffer menu bar.")
 
-(easy-menu-define magik-menu magik-mode-map
-  "Menu for Magik Mode."
-  `(,resources-magik-menu
-    [,resources-magik-menu-transmit-method   magik-transmit-method         :active (sw-buffer-mode-list 'gis-mode)
-	 				                                   :keys "f7, f2 f7, f2 m"]
-    [,resources-magik-menu-transmit-region   magik-transmit-region         :active (sw-buffer-mode-list 'gis-mode)
-					                                   :keys "f8, f2 f8, f2 r"]
-    [,resources-magik-menu-transmit-buffer   magik-transmit-buffer         :active (sw-buffer-mode-list 'gis-mode)
-					                                   :keys "f2 b"]
-    [,resources-magik-menu-transmit-chunk    magik-transmit-$-chunk        :active (sw-buffer-mode-list 'gis-mode)
-					                                   :keys "f2 $"]
-    [,resources-magik-menu-transmit-thing    magik-transmit-thing          :active (sw-buffer-mode-list 'gis-mode)
-					                                   :keys "f2 RET"]
-    "---"
-    [,resources-magik-menu-work-copy-region  magik-copy-region-to-buffer   :active t :keys "f4 r"]
-    [,resources-magik-menu-work-copy-method  magik-copy-method-to-buffer   :active t :keys "f4 m"]
-    [,resources-magik-menu-work-set-buffer   magik-set-work-buffer-name    :active t :keys "f4 n"]
-    "---"
-    [,resources-magik-menu-electric-template explicit-electric-magik-space :active t :keys "f2 SPC"]
-    [,resources-magik-menu-mark-method       magik-mark-method             :active t :keys "C-M-h, f9"]
-    [,resources-magik-menu-copy-method       magik-copy-method             :active t :keys "f4 c, f6"]
-    [,resources-magik-menu-compare-methods   magik-compare-methods         :active t :keys "f4 w"]
-    [,resources-magik-menu-ediff-methods     magik-ediff-methods           :active t :keys "f4 e"]
-    [,resources-magik-menu-cb-ediff-methods  cb-magik-ediff-methods        :active t :keys "f4 f3"]
-    "---"
-    [,resources-magik-menu-add-debug         magik-add-debug-statement     :active t :keys "f4 s"]
-    [,resources-magik-menu-trace             magik-trace-curr-statement    :active t :keys "f2 t"]
-    [,resources-magik-menu-complete          magik-symbol-complete          :active (sw-buffer-mode-list 'gis-mode) :keys "f4 f4"]
-    [,resources-deep-print-menu-start        deep-print                     :active (and (fboundp 'deep-print)
-											 (sw-buffer-mode-list 'gis-mode))
-					                                   :keys "f2 x"]
-    "---"
-    [,resources-magik-menu-heading           magik-heading                 :active t :keys "f2 h"]
-    [,resources-magik-menu-comment           magik-comment-region          :active t :keys "f2 #"]
-    [,resources-magik-menu-uncomment         magik-uncomment-region        :active t :keys "f2 ESC #"]
-    [,resources-magik-menu-fill              fill-magik-public-comment     :active t :keys "f2 q"]
-    "---"
-    (,resources-magik-menu-toggle
-     [,resources-magik-menu-toggle-name-mode      magik-method-name-mode
-						  :active t
-						  :style toggle
-						  :selected magik-method-name-mode]
-     [,resources-magik-menu-toggle-electric-mode  electric-magik-mode
-						  :active t
-						  :keys "f2 e"
-						  :style toggle
-						  :selected electric-magik-mode]
-     [,resources-magik-menu-toggle-debug          toggle-transmit-magik-debug-p
-						  :active t
-						  :style toggle
-						  :selected transmit-magik-debug-p]
-     [,resources-magik-menu-toggle-mark-exchange  magik-mark-method-exchange-mode
-						  :active t
-						  :style toggle
-						  :selected magik-mark-method-exchange]
-     ,resources-magik-menu-options
-     [,resources-magik-menu-option-eom-mode-on    (magik-transmit-method-eom-mode 'end)
-						  :active t
-						  :style radio
-						  :selected (eq magik-transmit-method-eom-mode 'end)]
-     [,resources-magik-menu-option-eom-mode-off   (magik-transmit-method-eom-mode nil)
-						  :active t
-						  :style radio
-						  :selected (eq magik-transmit-method-eom-mode nil)]
-     [,resources-magik-menu-option-eom-mode-repeat (magik-transmit-method-eom-mode 'repeat)
-						  :active t
-						  :style radio
-						  :selected (eq magik-transmit-method-eom-mode 'repeat)
-						  ])
-    [,resources-menu-sw-customize            magik-customize               t]
-    [,resources-magik-menu-language-help     magik-language-help           t]
-    [,resources-menu-sw-help                 magik-help                    t]))
-
-(defvar magik-mode-abbrev-table nil 
-  "Abbrev table in use in Magik-mode buffers")
+(defvar magik-mode-abbrev-table nil
+  "Abbrev table in use in Magik-mode buffers.")
 
 (defvar magik-mode-syntax-table nil
   "Syntax table in use in Magik-mode buffers.")
@@ -374,19 +289,19 @@ because it does not have an _ preceding like all the other Magik keywords.")
 
 (defvar magik-keyword-operators
   '("and" "andif" "div" "is" "isnt" "cf" "mod" "not" "or" "orif" "xor")
-  "List of keywords relating to operators to highlight for font-lock")
+  "List of keywords relating to operators to highlight for font-lock.")
 
 (defvar magik-keyword-class
   '("self" "super" "clone")
-  "List of keywords relating to exemplars to highlight for font-lock")
+  "List of keywords relating to exemplars to highlight for font-lock.")
 
 (defvar magik-keyword-methods
   '("abstract" "private" "method" "endmethod" "primitive")
-  "List of keywords relating to methods to highlight for font-lock")
+  "List of keywords relating to methods to highlight for font-lock.")
 
 (defvar magik-keyword-procedures
   '("proc" "endproc")
-  "List of keywords relating to procedures to highlight for font-lock")
+  "List of keywords relating to procedures to highlight for font-lock.")
 
 (defvar magik-keyword-statements
   '("block" "endblock" "catch" "throw" "endcatch"
@@ -394,30 +309,30 @@ because it does not have an _ preceding like all the other Magik keywords.")
     "lock" "endlock" "protect" "locking" "protection" "endprotect"
     "try" "endtry" "when" "handling" "with" "using"
     "pragma" "package" "default" "thisthread")
-  "List of keywords relating to statements to highlight for font-lock")
+  "List of keywords relating to statements to highlight for font-lock.")
 
 (defvar magik-keyword-loop
   '("iter" "continue" "finally" "for" "loop" "endloop" "loopbody" "over" "leave")
-  "List of keywords relating to loops to highlight for font-lock")
+  "List of keywords relating to loops to highlight for font-lock.")
 
 (defvar magik-keyword-arguments
   '("gather" "scatter" "allresults" "optional" "return")
-  "List of keywords relating to arguments to highlight for font-lock")
+  "List of keywords relating to arguments to highlight for font-lock.")
 
 (defvar magik-keyword-variable
   '("dynamic" "global" "import" "local" "recursive")
-  "List of keywords relating to variables to highlight for font-lock")
+  "List of keywords relating to variables to highlight for font-lock.")
 
 (defvar magik-keyword-obsolete
   '("concat" "case" "endcase" "otherwise" "void")
-  "List of obsolete/unimplemented keywords to highlight for font-lock")
+  "List of obsolete/unimplemented keywords to highlight for font-lock.")
 
 (defvar magik-other-keywords '(">>" "def_indexed_exemplar" "def_slotted_exemplar")
-  "List of other Magik 'keywords'")
+  "List of other Magik 'keywords'.")
 
 (defvar magik-warnings
   '("TODO" "DEBUG" "FIXME" "sys!slot" "sys!perform" "sys!perform_iter")
-  "List of Magik Warnings")
+  "List of Magik Warnings.")
 
 (defcustom magik-font-lock-class-face 'font-lock-type-face
   "*Font-lock Face to use when displaying exemplars."
@@ -521,7 +436,7 @@ constants which use the `font-lock-constant-face' face."
    :type 'sexp)
 
 (defcustom magik-font-lock-keywords-2
-  (list 
+  (list
    '("\\b_method\\s-*\\(\\sw*\\(\\s$\\S$*\\s$\\sw*\\)?\\)\.\\(\\sw*\\(\\s$\\S$*\\s$\\sw*\\)?\\)"
      (1 magik-font-lock-class-face)
      (3 magik-font-lock-method-face))
@@ -568,7 +483,7 @@ See `magik-font-lock-keywords-1' and `magik-font-lock-keywords-2'."
     (cons (concat "\\<\\(" (mapconcat 'identity magik-other-keywords "\\|") "\\)\\>") 'font-lock-keyword-face)
     '("^_pragma\\s-*\\(([^)]*)\\)" 1 magik-font-lock-pragma-face)
     ;; methods
-    '("\\(\\sw\\|\\s$\\)\\.\\(\\sw*\\(\\s$\\S$*\\s$\\sw*\\)?\\)\\(\\s-*(\\)" 2 magik-font-lock-method-face)   
+    '("\\(\\sw\\|\\s$\\)\\.\\(\\sw*\\(\\s$\\S$*\\s$\\sw*\\)?\\)\\(\\s-*(\\)" 2 magik-font-lock-method-face)
     ;; procedures
     '("\\<\\(\\sw+\\)\\(\\s-*(\\)" 1 magik-font-lock-procedure-face)
     '("^\\(def_slotted_exemplar\\|def_indexed_exemplar\\)\\>" 0 magik-font-lock-class-face t)
@@ -580,13 +495,13 @@ See `magik-font-lock-keywords-1' and `magik-font-lock-keywords-2'."
     ))
   "Font lock setting for 4th level of Magik fontification.
 As 1st level but also fontifies all Magik keywords according their
-different classifications. ie. loop keywords are fontified in the same face."
+different classifications.  ie. loop keywords are fontified in the same face."
    :group 'magik
    :type 'sexp)
 
 (defcustom magik-font-lock-keywords-5
   (append magik-font-lock-keywords-4 nil)
-  "Provides an easy user configurable level for personal/site fontification of styles. Based from `magik-font-lock-keywords-4'."
+  "Provides an easy user configurable level for personal/site fontification of styles.  Based from `magik-font-lock-keywords-4'."
    :group 'magik
    :type 'sexp)
 
@@ -618,7 +533,7 @@ different classifications. ie. loop keywords are fontified in the same face."
   "Alist to help searching for method types.")
 
 (defvar magik-transmit-method-eom-alist
-  (list (cons resources-magik-menu-option-eom-mode-off    nil) 
+  (list (cons resources-magik-menu-option-eom-mode-off    nil)
 	(cons resources-magik-menu-option-eom-mode-on     'end)
 	(cons resources-magik-menu-option-eom-mode-repeat 'repeat))
   "Alist of options for `magik-transmit-method-eom-mode'.")
@@ -726,6 +641,7 @@ Use auto-complete mode \"g\" symbol convention to represent a global.")
 ;;; Functions
 
 (defun expand-magik-abbrev ()
+  "Expand Magik Abbreviation."
   (save-excursion
     (let*
         ((toks (progn (insert ? )  ;; so that the token closes!
@@ -752,6 +668,7 @@ Use auto-complete mode \"g\" symbol convention to represent a global.")
   (funcall magik-goto-code-function))
 
 (defun magik-font-lock-fontify-buffer ()
+  "Fontify buffer."
   (let ((verbose (if (numberp font-lock-verbose)
 		     (> (buffer-size) font-lock-verbose)
 		   font-lock-verbose))
@@ -778,7 +695,7 @@ Use auto-complete mode \"g\" symbol convention to represent a global.")
 	(font-lock-unset-defaults)))))
 
 (defun magik-font-lock-unfontify-buffer ()
-  ;; Make sure we unfontify etc. in the whole buffer.
+  "Make sure we unfontify etc in the whole buffer."
   (save-restriction
     (widen)
     (font-lock-unfontify-region (save-excursion (magik-goto-code)) (point-max))
@@ -786,6 +703,7 @@ Use auto-complete mode \"g\" symbol convention to represent a global.")
     (setq font-lock-fontified nil)))
 
 (defun magik-font-lock-fontify-region (beg end loudly)
+  "Fontify region from BEG to END and LOUDLY."
   (let*
       ((modified (buffer-modified-p))
        (buffer-undo-list t)
@@ -837,13 +755,14 @@ Use auto-complete mode \"g\" symbol convention to represent a global.")
       (set-buffer-modified-p nil))))
 
 (defun toggle-transmit-magik-debug-p (&optional arg)
-  "Toggle transmission of #DEBUG statements in Magik code."
+  "Toggle transmission of #DEBUG statements in Magik code.
+Uses ARG."
   (interactive "P")
   (setq transmit-magik-debug-p
 	(if (null arg)
 	    (not transmit-magik-debug-p)
 	  (> (prefix-numeric-value arg) 0)))
-  (message 
+  (message
    (if transmit-magik-debug-p
        resources-transmit-magik-debug-on
      resources-transmit-magik-debug-off)))
@@ -875,7 +794,7 @@ Use auto-complete mode \"g\" symbol convention to represent a global.")
 
 ;; bound to CR in magik mode.
 (defun magik-newline ()
-  "Insert a newline and indent.  (To insert a newline and not indent, use C-j)."
+  "Insert a newline and indent.  (To insert a newline and not indent, use Ctl-j)."
   (interactive "*")
   (if (eq major-mode 'gis-mode)
       (error resources-magik-mode-is-gis-error))
@@ -921,8 +840,7 @@ For normal methods:
 
 For array methods
   NAME is nil
-  TYPE is '[]' or '[]<<' or '[]^<<' or '[,]' or '[,]<<' or '[,]^<<' etc.
-"
+  TYPE is '[]' or '[]<<' or '[]^<<' or '[,]' or '[,]<<' or '[,]^<<' etc."
   (if (eq (elt name 0) ?\[)
       (cons nil name)
     (save-match-data
@@ -932,10 +850,10 @@ For array methods
 
 (defun magik-goto-class-method (method &optional class)
   "Find the specified METHOD and CLASS in the current buffer.
-If more than one definition is found in the buffer, you will be 
+If more than one definition is found in the buffer, you will be
 given the opportunity to visit each definition.
 Also the search string is added to isearch mode's regexp ring so that
-you can use \\[isearch-forward-regexp] and use M-p to recall the search."
+you can use \\[isearch-forward-regexp] and use \\<alt-p> to recall the search."
   (interactive
    (list
     (read-string (concat resources-magik-goto-method-prompt ": ") (current-word))
@@ -964,7 +882,7 @@ you can use \\[isearch-forward-regexp] and use M-p to recall the search."
       ;; look for array definitions: [] []<< []^<< [,] [,]<< [,]^<<
       (or (setq search-str (cdr (assoc method-type magik-goto-class-method-alist)))
 	  (error resources-magik-goto-no-m-error method))
-      
+
       (if (re-search-forward (setq search-str (concat class search-str)) nil t)
 	  (magik-goto-class-method-loop search-str method)
 	(error resources-magik-goto-no-m-error method)))
@@ -993,9 +911,10 @@ you can use \\[isearch-forward-regexp] and use M-p to recall the search."
       (error resources-magik-goto-no-m-in-c-error method class)))))
 
 (defun magik-goto-class-method-loop (search-str arg)
-  "Loop over subsequent definitions.
-Adds string to `regexp-search-ring'. After wuiting this loop
-you can use \\[isearch-forward-regexp] and use M-p to recall this search."
+  "Loop over subsequent definitions looking for SEARCH-STR.
+Uses ARG.
+Adds string to `regexp-search-ring'.  After wuiting this loop
+you can use \\[isearch-forward-regexp] and use \\alt-p to recall this search."
   ;;I would like to use the isearch functionality but I cannot work out
   ;;how to control isearch programmatically.
   (let ((continue-p t)
@@ -1026,9 +945,10 @@ you can use \\[isearch-forward-regexp] and use M-p to recall this search."
       (where-is 'isearch-forward-regexp))))
 
 (defun backward-method (&optional noerror)
-  "Put point at beginning of this method."
+  "Put point at beginning of this method.
+Uses NOERROR."
   (interactive)
-  
+
   (when (re-search-backward "^\\s-*\\(_abstract\\(\n\\|\\s-\\)+\\)?\\(_private\\(\n\\|\\s-\\)+\\)?\\(_iter\\(\n\\|\\s-\\)+\\)?_method\\s-+" nil noerror)
     (while
 	(and (not (bobp))
@@ -1040,7 +960,8 @@ you can use \\[isearch-forward-regexp] and use M-p to recall this search."
     t))
 
 (defun forward-method (&optional noerror)
-  "Put point at beginning of the next method."
+  "Put point at beginning of the next method.
+Uses NOERROR."
   (interactive)
   (save-match-data
     (and (not (eobp))
@@ -1048,7 +969,7 @@ you can use \\[isearch-forward-regexp] and use M-p to recall this search."
 	   (beginning-of-line)
 	   (looking-at "^\\(\\s-*\\(_abstract\\|_private\\|_iter\\|_method\\|_pragma\\|#\\)\\)\\|$"))
 	 (forward-endmethod noerror))
-    
+
     (when (re-search-forward "^\\s-*\\(_abstract\\(\n\\|\\s-\\)+\\)?\\(_private\\(\n\\|\\s-\\)+\\)?\\(_iter\\(\n\\|\\s-\\)+\\)?_method\\s-+" nil noerror)
       (forward-line 1)
       (while (and (not (bobp))
@@ -1059,7 +980,8 @@ you can use \\[isearch-forward-regexp] and use M-p to recall this search."
 	(forward-line 1)))))
 
 (defun forward-endmethod (&optional noerror)
-  "Put point at beginning of line after next _endmethod (including $)."
+  "Put point at beginning of line after next _endmethod (including $).
+Uses NOERROR."
   (interactive)
   (save-match-data
     (when (re-search-forward "^\\s-*_endmethod\\s-*\\(\n\\$\\s-*\\)?$" nil noerror)
@@ -1068,7 +990,8 @@ you can use \\[isearch-forward-regexp] and use M-p to recall this search."
 
 (defun magik-mark-method (&optional nomsg)
   "Mark the current method.
-Repeated commands extends the marked region to include the next method as well."
+Repeated commands extends the marked region to include the next method as well.
+Uses NOMSG".
   (interactive)
   (if (eq last-command 'magik-mark-method)
       (let (pt)
@@ -1084,7 +1007,7 @@ Repeated commands extends the marked region to include the next method as well."
   (mark))
 
 (defun mark-method ()
-  "DEPRECATED. Mark the current method.
+  "DEPRECATED.  Mark the current method.
 This is an old function."
   ;; also returns the value of mark.
   (interactive)
@@ -1109,9 +1032,9 @@ If the last command was \\[magik-mark-method] then that region will be copied in
       (save-match-data
 	(magik-mark-method)
 	(kill-new (buffer-substring (point) (mark)))))))
-	
+
 (defun magik-function-convert (x)
-  "Convert lisp object X type into an equivalent Magik object type."
+  "Convert Lisp object X type into an equivalent Magik object type."
   (cond ((eq x 'unset)
 	 "_unset")
 	((or (eq x 'false) (eq x nil))
@@ -1128,7 +1051,7 @@ If the last command was \\[magik-mark-method] then that region will be copied in
 	 x)))
 
 (defun magik-function (cmd &rest args)
-"this function generates magik code from the supplied arguments.
+"Generate magik code from the supplied arguments (CMD and ARGS).
 e.g. (magik-function \"system.test\" \"file\" 'unset 4) returns the string
      system.test(\\\"file\\\", _unset, 4)"
 
@@ -1138,7 +1061,7 @@ e.g. (magik-function \"system.test\" \"file\" 'unset 4) returns the string
   (concat cmd "(" (mapconcat 'identity args ", ") ")\n"))
 
 (defun magik-gis-error-goto (&optional gis)
-  "Goto the previous magik error."
+  "Goto the previous magik error in GIS."
   (interactive)
   (let ((gis (sw-get-buffer-mode gis
 				 'gis-mode
@@ -1165,8 +1088,9 @@ e.g. (magik-function \"system.test\" \"file\" 'unset 4) returns the string
 	  (gis-error-goto)))))
 
 (defun magik-perform-replace-no-set-mark (from to regexp-flag)
-  "like `perform-replace' but without setting the mark and without
-`query' or `delimited' flags."
+  "Replace like `perform-replace' but without setting the mark.
+And without `query' or `delimited' flags.
+Uses FROM TO and REGEXP-FLAG."
   (let ((literal (not regexp-flag))
 	(search-function (if regexp-flag 're-search-forward 'search-forward)))
     (while (and (not (eobp))
@@ -1174,10 +1098,12 @@ e.g. (magik-function \"system.test\" \"file\" 'unset 4) returns the string
       (replace-match to t literal))))
 
 (defun magik-transmit-method-eom-mode (arg)
-  "Toggle whether to move the cursor to the end of the method after tranmitting
+  "Toggle moving the cursor to the end of the method after transmit.
 If nil, leave point where it is,
 If t or 'end, move point to end of method,
-If 'repeat, move point to end of method on 2nd and subsequent uses of the command."
+If 'repeat, move point to end of method on 2nd
+and subsequent uses of the command.
+Uses ARG."
   (interactive
    (list
     (cdr (assoc (completing-read (concat "Transmit Method EOM Mode:" " ")
@@ -1186,7 +1112,7 @@ If 'repeat, move point to end of method on 2nd and subsequent uses of the comman
 		magik-transmit-method-eom-alist))))
   (setq magik-transmit-method-eom-mode arg)
 
-  (message 
+  (message
    (cond ((null magik-transmit-method-eom-mode)
 	  resources-magik-transmit-method-eom-off)
 	 ((eq magik-transmit-method-eom-mode 'end)
@@ -1195,14 +1121,15 @@ If 'repeat, move point to end of method on 2nd and subsequent uses of the comman
 	  resources-magik-transmit-method-eom-on-repeat))))
 
 (defun magik-mark-method-exchange-mode (&optional arg)
-  "Toggle whether the cursor is placed at the beginning or end of the marked region.
-See `magik-mark-method-exchange' for more details."
+  "Toggle whether the cursor is placed at the beginning or end.
+See `magik-mark-method-exchange' for more details.
+Uses ARG."
   (interactive "P")
   (setq magik-mark-method-exchange
 	(if (null arg)
 	    (not magik-mark-method-exchange)
 	  (> (prefix-numeric-value arg) 0)))
-  (message 
+  (message
    (if magik-mark-method-exchange
        resources-magik-mark-method-exchange-on
      resources-magik-mark-method-exchange-off)))
@@ -1215,7 +1142,7 @@ See `magik-mark-method-exchange' for more details."
 (defalias 'transmit-buffer-to-magik 'magik-transmit-buffer)
 
 (defun magik-transmit-thing ()
-  "Transmit the top-level Magik programming construct surrounding point.
+  "Transmit the 'top-level' Magik programming construct surrounding point.
 The construct can be a method, a proc, a def_slotted_exemplar or whatever.
 The rule is that the thing must start against the left margin."
   (interactive)
@@ -1246,7 +1173,7 @@ The rule is that the thing must start against the left margin."
                     (pop stack)
                   (goto-char (cdr tok))
                   (error resources-magik-expecting-token-error
-                         (car tok) 
+                         (car tok)
                          (cdr (assoc (car stack) magik-begins-and-ends)))))))
             (forward-line))
           (if (< (point) original-point)
@@ -1263,7 +1190,7 @@ The rule is that the thing must start against the left margin."
   ;;with use of prefix to identify GIS session to send to.
   (interactive)
   (save-excursion
-    (save-match-data 
+    (save-match-data
       (let ((pt (point))
 	    (end (or (re-search-forward "^\\$" nil t)
 		     (goto-char (point-max)))))
@@ -1307,9 +1234,10 @@ Otherwise, point is left where it is."
 (defalias 'transmit-method-to-magik 'magik-transmit-method)
 
 (defun magik-transmit-region (beg end)
-   "Send current region via a temp file to Magik in a shell, using load-file.
-If this command is repeated before the previous file has been processed by Magik,
-another file shall be written."
+   "Send current region (BEG to END) via a temp file to Magik.
+Runs in a shell, using 'load-file'.
+If this command is repeated before the previous file
+has been processed by Magik, another file shall be written."
    (interactive "r")
    (magik-transmit-string (buffer-substring-no-properties beg end)
 			  (save-excursion
@@ -1334,8 +1262,9 @@ another file shall be written."
 
 (defun magik-transmit-string (str package do-magik-command tidy-magik-command &optional start gis process)
    "Generalised function to send code to Magik via a temporary file.
-If this command is repeated before the previous file has been processed by Magik,
-another file shall be written."
+If this command is repeated before the previous file
+has been processed by Magik, another file shall be written.
+Uses STR PACKAGE DO-MAGIK-COMMAND TIDY-MAGIK-COMMAND START GIS PROCESS."
    (let* ((gis (sw-get-buffer-mode gis
 				   'gis-mode
 				   resources-gis-enter-buffer
@@ -1391,12 +1320,13 @@ another file shall be written."
 
 (defun magik-gis-drag-n-drop-load (gis filename)
   "Interface to Drag 'n' Drop GIS mode.
+Drops FILENAME into GIS."
 Called by `gis-drag-n-drop-load' when a Magik file is dropped."
   (let ((process (barf-if-no-gis gis)))
     (message resources-magik-transmit-string gis)
     (process-send-string
      process
-     (concat 
+     (concat
       (magik-function "load_file" filename)
       "$\n"))))
 
@@ -1407,9 +1337,9 @@ Called by `gis-drag-n-drop-load' when a Magik file is dropped."
 Indents with the TAB or RET keys, inserts underscores, and sends Magik
 to a running gis with `F2 b', `F2 m', `F2 r', or `F2 RET'.
 Creates programming templates like
-  _if 
+  _if
   _then
-          
+
   _endif
 with `F2 SPC' and trace statements with `F2 t'.
 Fills private (#) or public (##) comments with `F2 q'.
@@ -1503,7 +1433,7 @@ With a negative numeric arg, remove  method name from the mode line."
   (if magik-method-name-mode
       (add-hook 'post-command-hook 'magik-method-name-set)
     (remove-hook 'post-command-hook 'magik-method-name-set))
-  (message 
+  (message
    (if magik-method-name-mode
        resources-magik-method-name-on
      resources-magik-method-name-off)))
@@ -1514,14 +1444,14 @@ With a negative numeric arg, remove  method name from the mode line."
   (add-text-properties 0 (length buf)
 		       (list
 			'face '(:weight bold)
-			'help-echo 
+			'help-echo
 			(purecopy "mouse-1: previous buffer, mouse-3: next buffer")
 			'local-map mode-line-buffer-identification-keymap)
 		       buf)
   (add-text-properties 0 (length method)
 		       (list
 			'face '(:inverse-video t)
-			'help-echo 
+			'help-echo
 			(purecopy "mouse-1: previous buffer, mouse-3: next buffer")
 			'local-map mode-line-buffer-identification-keymap)
 		       method)
@@ -1533,7 +1463,7 @@ Where the type of the method is the method's postfix characters:
  ()
  <<
  ^<<
- [] 
+ []
  [,]
  ()<<
  ()^<<
@@ -1850,7 +1780,7 @@ Otherwise create a sensibly named buffer based upon the class name of the method
 	    ((eq (following-char) ?\[)
 	     (or (search-forward "]" nil t)
 		 (error resources-magik-no-square-bracket-error))))
-      
+
       (forward-endmethod)
       (magik-copy-region-to-buffer (mark t) (point) buffer))))
 
@@ -1860,7 +1790,7 @@ Otherwise create a sensibly named buffer based upon the class name of the method
 otherwise prompt user."
   (interactive "r")
   (setq buffer (or buffer magik-work-buffer (read-buffer "Buffer: ")))
-  
+
   (let ((code (buffer-substring start end)))
     (set-buffer (get-buffer-create buffer))
     (goto-char (point-max))

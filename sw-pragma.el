@@ -171,7 +171,7 @@ sw-pragma-magik-deprecated-template-end)
   "Regexp that matches any indented Template for deprecated methods.")
 
 ;;Make a regexp to match template when indented. ie. insert \s-* at front of every none empty line.
-(if (sw-pragma-magik-deprecated-template-re)  ;;Already defined so do nothing.
+(if (boundp 'sw-pragma-magik-deprecated-template-re)  ;;Already defined so do nothing.
     nil
   (setq sw-pragma-magik-deprecated-template-re sw-pragma-magik-deprecated-template)
   (let (start)
@@ -240,7 +240,7 @@ Uses DIRECTION."
 	   ;;Insert the template setting read-only property on the start and end text fields
 	   (insert template)
 	   (indent-region start (point) column)
-	   (message resources-sw-pragma-deprecated-template))))))
+	   (message "Use toggle keys, \\ and /, on 'Action' line to choose action."))))))
 
 (defun sw-pragma-remove-magik-deprecated-template ()
 "Remove the template for deprecated methods.
@@ -260,7 +260,7 @@ wish to remove it otherwise the template is removed silently."
 	  (setq end (re-search-forward (concat "\\s-*" sw-pragma-magik-deprecated-template-end) nil t))
 	  (and start
 	       end
-	       (y-or-n-p (concat resources-sw-pragma-yn-deprecated-modify-comments " "))
+	       (y-or-n-p "Remove modifed deprecated comments?")
 	       (delete-region start end)))))))
 
 ;;;;;;;;;;;;;;;;;;;; Sw-Pragma toggle options ;;;;;;;;;;;;;;;;;;;
@@ -426,7 +426,15 @@ Uses CURRENT, NEXT and REVERSE."
     (pop-to-buffer "*topic-selection*")
     (erase-buffer)
     (topic-select-mode)
-    (insert resources-sw-pragma-topic-selection)
+    (insert "T O P I C   S E L E C T I O N
+
+y or m - mark a line           n or u - unmark a line
+e      - edit the topic list
+SPC    - move down a line
+RET    - accept the selection
+q      - quit
+
+-----------------------------------------------")
     (mapc 'insert-file-contents sw-pragma-files)
     (and product-sw-pragma-file
 	 (not (member product-sw-pragma-file sw-pragma-files))
@@ -434,7 +442,7 @@ Uses CURRENT, NEXT and REVERSE."
 	 (insert-file-contents product-sw-pragma-file))
     (or sw-pragma-files
 	product-sw-pragma-file
-	(error resources-sw-pragma-no-smallworld-gis-env))
+	(error "There is no value for $SMALLWORLD_GIS"))
     (goto-char
      (prog1
          (point)
@@ -454,7 +462,7 @@ Uses CURRENT, NEXT and REVERSE."
   (interactive)
   (kill-all-local-variables)
   (setq major-mode 'topic-select-mode)
-  (setq mode-name resources-sw-pragma-topic-select)
+  (setq mode-name "Topic Select")
   (use-local-map topic-select-mode-map)
   (set-syntax-table topic-select-mode-syntax-table)
   (setq local-abbrev-table topic-select-mode-abbrev-table)
@@ -520,7 +528,7 @@ Beep if not looking at \"[ >] (\""
 	    (concat (file-name-as-directory (getenv "SMALLWORLD_GIS"))
 		    "data/doc/sw-pragma_topics")))
 	  (t
-	   (error resources-sw-pragma-no-smallworld-gis-env)))))
+	   (error "There is no value for $SMALLWORLD_GIS")))))
 
 (provide 'sw-pragma)
 

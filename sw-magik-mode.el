@@ -989,9 +989,7 @@ Uses NOERROR."
       t)))
 
 (defun magik-mark-method (&optional nomsg)
-  "Mark the current method.
-Repeated commands extends the marked region to include the next method as well.
-Uses NOMSG".
+  "Mark the current method. Repeated commands extends the marked region to include the next method as well. Uses NOMSG".
   (interactive)
   (if (eq last-command 'magik-mark-method)
       (let (pt)

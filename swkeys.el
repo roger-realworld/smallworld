@@ -1,5 +1,9 @@
 ;;; swkeys.el -- bind all the SW keys, menus and mouse actions.
 
+;;; Commentary:
+
+;;; Code:
+
 (eval-when-compile
   (require 'cl)
   (require 'resources)
@@ -293,9 +297,8 @@ For transition to using default.el rather than .emacs to load code.")
   (sw-define-key cb-mode-map [right]   'cb-forward-char)
   (sw-define-key cb-mode-map [mouse-2] 'cb-mouse)
 
-  (eval-if-gnu-emacs
-   (define-key cb-mode-map [mode-line mouse-1] 'cb-mode-line-click)
-   (define-key cb-mode-map [mode-line mouse-2] 'cb-mode-line-click))
+  (define-key cb-mode-map [mode-line mouse-1] 'cb-mode-line-click)
+  (define-key cb-mode-map [mode-line mouse-2] 'cb-mode-line-click)
 
   (define-key cb-f3-map [up]   'cb-fold)
   (define-key cb-f3-map [down] 'cb-unfold)

@@ -94,8 +94,8 @@ either find-file-existing-other-name or find-file-visit-truename are t."
 (fset 'delete-backward-char-untabify  ;get round typo in the original
       'backward-delete-char-untabify) ;template .emacs.
 
-(defun-if-gnu-emacs mouse-scroll-screen (event)
-  "Scroll a window by dragging the mouse."
+(defun mouse-scroll-screen (event)
+  "Scroll a window by dragging the mouse on EVENT."
   (interactive "e")
   (let*
       ((fn 'posn-col-row)               ; An indirection to stop the
@@ -116,8 +116,8 @@ either find-file-existing-other-name or find-file-visit-truename are t."
     (if (window-live-p orig-win)
         (select-window orig-win))))
 
-(defun-if-gnu-emacs mode-line-resize (event)
-  "Drag a mode line up and down, to resize the windows."
+(defun mode-line-resize (event)
+  "Drag a mode line up and down, to resize the windows on EVENT."
   (interactive "e")
   (let*
       ((fn 'posn-col-row)           ; An indirection (see comment above).
@@ -180,27 +180,6 @@ they can be in either order."
       (setq string (buffer-substring (point-min) (point-max)))
 					;(kill-buffer temp-buffer)
       string)))
-
-;; Emacs 21 provides an optional argument to add-to-list
-(defun-if (or emacs19 emacs20)
-  add-to-list (list-var element &optional append)
-  "Add to the value of LIST-VAR the element ELEMENT if it isn't there yet.
-The test for presence of ELEMENT is done with `equal'.
-If ELEMENT is added, it is added at the beginning of the list,
-unless the optional argument APPEND is non-nil, in which case
-ELEMENT is added at the end.
-
-If you want to use `add-to-list' on a variable that is not defined
-until a certain package is loaded, you should put the call to `add-to-list'
-into a hook function that will be run only after loading the package.
-`eval-after-load' provides one way to do this.  In some cases
-other hooks, such as major mode hooks, can do the job."
-  (if (member element (symbol-value list-var))
-      (symbol-value list-var)
-    (set list-var
-	 (if append
-	     (append (symbol-value list-var) (list element))
-	   (cons element (symbol-value list-var))))))
 
 (defmacro-if (not (fboundp 'error-message-string))
   error-message-string (err)
@@ -386,21 +365,6 @@ Mirrored XEmacs Event function in FSF Emacs."
 
 (or (fboundp 'tool-bar-local-item)
     (defalias 'tool-bar-local-item 'ignore))
-
-;;; replace-match
-;; Note replace match is a 'built-in' i.e. its source is in C code.
-;;
-;; Make earlier emacs versions accept 5 argument replace-match to allow
-;; Smallworld code to load and be byte-compiled on earlier versions of Emacs.
-;; This does mean that the places where the 5 argument version is used will not work on Emacs 19.
-(if (and (or emacs19)
-	 (not (fboundp 'replace-match-emacs19)))
-    (let ((doc-string (documentation 'replace-match)))
-      (fset 'replace-match-emacs19 (symbol-function 'replace-match))
-      (fset 'replace-match
-	    (list 'lambda '(NEWTEXT &optional FIXEDCASE LITERAL STRING SUBEXP)
-		  doc-string
-		  '(replace-match-emacs19 NEWTEXT FIXEDCASE LITERAL)))))
 
 ;; Some useful Elisp interfaces to Window functions
 (defun-if (running-under-nt)

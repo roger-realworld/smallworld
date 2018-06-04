@@ -1,4 +1,7 @@
 ;;; cb.el -- Class Browser for Magik methods and classes.
+
+;;; Commentary:
+
 ;;
 ;;; Works in conjunction with the method_finder C program.
 ;;
@@ -10,12 +13,12 @@
 ;; completely rule out the use of more than one cb at a time because the main
 ;; cb buffer could be renamed and its state taken with it in some form.
 ;; Also cb processes are fairly heavy and if someone really wants another
-;; cb they can start another emacs.
+;; cb they can start another Emacs.
 ;;
 ;; The subsidiary cb buffer, for want of a better name, is called "*cb2*"
 ;; and is meant to be temporary.  (All the useful cb state is kept in the
 ;; cb globals, which makes debugging a lot easier because the globals are
-;; readable and settable from the lisp buffers).  At different times the
+;; readable and settable from the Lisp buffers).  At different times the
 ;; "*cb2*" buffer behaves in quite different ways (topic selection,
 ;; family-tree display, full method details display), but its mode is
 ;; always cb-mode (just like the main "*cb*" buffer).
@@ -61,25 +64,26 @@
 ;;   startup is further simplified by only allowing F3 F3 as the
 ;;   the startup command.
 
+;;; Code:
+
 ;;shut compiler up...
 (eval-when-compile
-  (require 'cl)
   (defvar mode-line-format-sym)
   (defvar msb-menu-cond)
   (defvar ac-triggered)
   (defvar ac-prefix)
   (defvar ac-limit)
 
+  (require 'resources.msgc)
   (require 'macros-sw)
   (require 'misc-sw)
   (require 'utils-sw)
   (require 'sw-help)
   (require 'magik)
+  (require 'resources)
   (defvar gis-buffer)
   ;;Cannot require 'gis because of circular dependency
   )
-
-(require 'cl)
 
 (require 'macros-sw)
 (require 'misc-sw)
@@ -101,7 +105,7 @@
   "Fontification colours for Class Browser."
   :group 'cb)
 
-(defface cb-font-lock-optional-face
+(defface cb-font-lock-optional
    '((((type tty) (class color)) (:foreground "yellow" :weight light))
      (((class grayscale) (background light))
       (:foreground "Gray90" :bold t))
@@ -112,18 +116,16 @@
      (t (:bold t)))
   "Font-lock Face to use when displaying _optional variables.
 
-Based upon `font-lock-variable-name-face'"
+Based upon 'font-lock-variable-name-face'"
   :group 'cb-faces)
 
-(defface cb-cursor-face
-  (if xemacs-p ;XEmacs cannot display background data on its mode-line and does not support inverse video either
-      '((t (:foreground "Grey50")))
-    '((t (:inverse-video t))))
+(defface cb-cursor
+  '((t (:inverse-video t)))
   "Face to use for the Mode line cursor."
   :group 'cb-faces)
 
 ;; Originally just italic, but due to GDI object leak, made bold too - see magik.el for more details.
-(defface cb-font-lock-gather-face
+(defface cb-font-lock-gather
   '((((type tty) (class color)) (:foreground "yellow" :weight light))
     (((class grayscale) (background light))
      (:foreground "Gray90" :italic t))
@@ -192,16 +194,17 @@ Based upon `font-lock-variable-name-face'"
 
 ;; User configuration options
 (defcustom cb-jump-replaces-cb-buffer nil
-  "*If t, then when jumping to a source file, via \\[cb-jump-to-source],
+  "*If t, then the file buffer replaces the *cb* buffer.
+If true when jumping to a source file, via \\[cb-jump-to-source],
 the file buffer replaces the *cb* buffer.
 If nil, the file is displayed in another window and also keeps the *cb* buffer
 visible.
 
 The situation where it is useful to set this to t is as follows:
 you have two buffers, one with a magik file, the other with
-the class browser. If you jump to a file containing a method,
+the class browser.  If you jump to a file containing a method,
 the file containing the method will replace the window displaying the class
-browser. Thus, you now have two windows one displaying your magik file
+browser.  Thus, you now have two windows one displaying your magik file
 the other displaying the source file containing the method.
 
 You can now use Ediff to compare the buffers!"
@@ -223,9 +226,7 @@ the file name and PATH is the string that replaces a match of REGEXP."
   :group 'cb
   :type  'coding-system)
 
-(defcustom cb-mode-line-cursor (cond (xemacs-p "|") ;XEmacs cannot display background data on its mode-line
-				     ((or emacs19 emacs20) "'") ; Early GNU Emacsen cannot either
-				     (t " "))
+(defcustom cb-mode-line-cursor " "
   "*String to use as the cursor in the mode-line.
 `cb-cursor-face' is also used to modify the display of the character
 Can be set using \\[cb-set-mode-line-cursor]."
@@ -939,6 +940,7 @@ It also detects the method_finder version and configures the following buffer lo
 	    (assq n cb-buffer-alist))))
 
 (defun cb-set-windows (&optional buffer)
+  "Set windows to BUFFER."
   (setq buffer (or buffer (current-buffer)))
   (if (get-buffer-window buffer)
       (select-window (get-buffer-window buffer))
@@ -946,7 +948,8 @@ It also detects the method_finder version and configures the following buffer lo
 	  cb-was-started-from-top-half (window-highest-p (selected-window)))
     (switch-to-buffer-other-window buffer)))
 
-(defun-if-gnu-emacs window-highest-p (win)
+(defun window-highest-p (win)
+  "Set highest WIN."
   (zerop (second (window-edges win))))
 
 (defun cb-set-filename ()
@@ -1485,9 +1488,9 @@ the STR to the method_finder."
 
 (defun cb-next-inheritance-setting ()
   "Toggle the inheritance setting round the next setting.  The settings are:
-    local-only       - only display methods that are defined on the current classes.
-    inherit-not-\"obj\"   - display inherited methods too but not anything on object.
-    inherit-from-\"obj\"  - display methods on object too."
+local-only       - only display methods that are defined on the current classes.
+inherit-not-\"obj\"   - display inherited methods too but not anything on object.
+inherit-from-\"obj\"  - display methods on object too."
   (interactive)
   (cond 
    ((cb-topic-on-p "inherit-from-\"object\"")
@@ -2390,8 +2393,8 @@ Assumes method_finder is in SW_ACP_PATH."
         (kill-buffer (current-buffer))))))
 
 (defun cb-temp-file-name (p)
-  "The file-name of the file that the method_finder uses
-for passing data back to the class browser."
+  "Return the file-name of the temporary file used by the method_finder P.
+It uses the temporary file for passing data back to the class browser."
   (let ((file (concat "mfm" (number-to-string (process-id p)))))
     (if (running-under-nt)
 	(concat (getenv "TEMP") "\\" file)
@@ -2434,7 +2437,7 @@ See the variable `cb-generalise-file-name-alist' to provide more customisation."
 ;; _________________________
 
 (defun cb-ac-filter (p s)
-  "Process data coming back from the CB auto-complete buffer."
+  "Process data coming back from the CB auto-complete buffer for S in P."
   (with-current-buffer (process-buffer p)
     (unwind-protect
 	(let ((buffer (current-buffer))
@@ -2501,7 +2504,7 @@ Stores process object in `cb-ac-process'."
 	(nreverse candidates))))
 
 (defun cb-method-args (pt)
-  "Return method arguments from Class Browser at point."
+  "Return method arguments from Class Browser at PT."
   (save-excursion
     (goto-char pt)
     (save-match-data
@@ -2536,7 +2539,7 @@ Stores process object in `cb-ac-process'."
 
 ;;TODO extract out Magik method signature from callsification and documentation processing.
 (defun cb-method-docstring (class candidate args classify documentation)
-  "Return method documentation string."
+  "Return method documentation string for CLASS, CANDIDATE, ARGS, CLASSIFY and DOCUMENTATION."
   (let* ((required (elt args 0))
 	 (optional (elt args 1))
 	 (gather (elt args 2))
@@ -2638,8 +2641,7 @@ Stores process object in `cb-ac-process'."
 
 (defun cb-ac-method-candidates ()
   "Return list of methods for a class matching AC-PREFIX for auto-complete mode.
-AC-PREFIX is of the form \"CLASS\".\"METHOD_NAME_PREFIX\"
-"
+AC-PREFIX is of the form \"CLASS\".\"METHOD_NAME_PREFIX\""
   (let ((cb--ac-candidates 'unset) ; use 'unset symbol since nil is also a valid return value.
 	(ac-prefix ac-prefix)
 	(ac-limit (or ac-limit 1000000))
@@ -2685,7 +2687,7 @@ AC-PREFIX is of the form \"CLASS\".\"METHOD_NAME_PREFIX\"
 
 ;;MSB configuration
 (defun cb-msb-configuration ()
-  "Adds CB buffers to msb menu, supposes that msb is already loaded."
+  "Add CB buffers to msb menu, supposes that msb is already loaded."
   (let* ((l (length msb-menu-cond))
 	 (last (nth (1- l) msb-menu-cond))
 	 (precdr (nthcdr (- l 2) msb-menu-cond)) ; cdr of this is last

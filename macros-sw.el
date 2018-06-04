@@ -1,35 +1,19 @@
-;;; macros-sw.el - for suppressing Emacs and XEmacs byte-compiler warnings.
+;;; macros-sw.el --- for suppressing Emacs and XEmacs byte-compiler warnings.
 
+;;; commentary:
 
-(eval-and-compile
-  (defconst emacs19 (= (string-to-number emacs-version) 19))
-  (defconst emacs20 (= (string-to-number emacs-version) 20))
-  (defconst emacs21 (= (string-to-number emacs-version) 21))
-  (defconst emacs22 (= (string-to-number emacs-version) 22))
-  (defconst xemacs-p (string-match "XEmacs" emacs-version)))
+;;; code:
 
 (defconst macros-sw-version "$Revision: 1.16 $")
 
 (defmacro eval-if (condition &rest expr)
+  "Return an eval-if function for CONDITION and EXPR."
   (and (eval condition)
        (cons 'progn expr)))
 
-(defmacro eval-if-gnu-emacs (&rest expr)
-  (cons 'eval-if
-	(cons (not xemacs-p) expr)))
-
-(defmacro eval-if-xemacs (&rest expr)
-  (cons 'eval-if
-	(cons xemacs-p expr)))
-
-
-(defmacro eval-if-gnu-emacs-1925 (&rest expr)
-  (cons 'eval-if
-	(cons (string-match "^19\\.25" emacs-version)
-	      expr)))
-
 ;;macro
 (defmacro defmacro-if (condition f args &rest body)
+  "Return defmacro function for CONDITION F ARGS and BODY."
   (and (eval condition)
        (cons 'defmacro
 	     (cons f
@@ -37,28 +21,15 @@
 
 ;;defun
 (defmacro defun-if (condition f args &rest body)
+    "Return defun function for CONDITION F ARGS and BODY."
   (and (eval condition)
        (cons 'defun
 	     (cons f
 		   (cons args body)))))
 
-(defmacro defun-if-xemacs (f args &rest body)
-  (cons 'defun-if
-	(cons xemacs-p
-	      (cons f
-		    (cons args body)))))
-
-(defmacro defun-if-gnu-emacs (f args &rest body)
-  (cons 'defun-if
-	(cons (not xemacs-p)
-	      (cons f
-		    (cons args body)))))
-
 ;;OS macros
 (defmacro running-under-x ()
-  (if xemacs-p
-      '(eq (device-type) 'x)
-    '(eq window-system 'x)))
+  '(eq window-system 'x))
 
 
 (defmacro running-under-win32 ()

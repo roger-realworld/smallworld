@@ -1,5 +1,8 @@
 ;;; Smallworld internationalisation code of Emacs.
 
+;;; Commentary:
+
+;;; Code:
 (require 'macros-sw)
 
 (defgroup resources nil
@@ -53,8 +56,9 @@ The list has the primary language listed first."
 	(load msgc t t t))))
 
 (defun resources-load (&optional resources-dir additional)
-  "Load resources from directories.
-Optional DIR specifies parent directory containing the 'resources' directory structure.
+  "Load resources from RESOURCES-DIR and ADDITIONAL if specified."
+  
+"ptional DIR specifies parent directory containing the 'resources' directory structure.
 Optional ADDITIONAL list are directories containing additional messages to load.
 Messages loaded via ADDITIONAL will override any previous definitions."
   (let (dir dirs)
@@ -94,7 +98,7 @@ Based upon the syntax used in `msg-mode'.")
 (modify-syntax-entry ?\n "." resources-syntax-table)
 
 (defun resources-compile-file (file)
-  "Convert a Smallworld Emacs Message file to Elisp."
+  "Convert a Smallworld Emacs Message file FILE to Elisp."
   (save-excursion
     (let* ((visiting-buf (find-buffer-visiting file))
 	   (file-buf (or visiting-buf (find-file file))))
@@ -102,13 +106,13 @@ Based upon the syntax used in `msg-mode'.")
       (or visiting-buf (kill-buffer file-buf)))))
 
 (defun resources-compile-buffer (&optional buffer)
-  "Convert a Smallworld Emacs Message file to Elisp."
+  "Convert a Smallworld Emacs Message BUFFER to Elisp."
   (save-excursion
     (set-buffer (or buffer (current-buffer)))
     (let ((resources (get-buffer-create "*resources*"))
 	  (file (buffer-file-name))
 	  (syntax-table-orig (syntax-table))
-	  (elisp (concat (file-name-directory (buffer-file-name)) "resources.msgc.el"))   ;;(concat (buffer-file-name) "c.el") 
+	  (elisp (concat (file-name-directory (buffer-file-name)) "resources.msgc.el"))   ;;(concat (buffer-file-name) "c.el")
 	  var-val
 	  hmsg-p)
       (or (string-match "msg$" file)
@@ -137,7 +141,7 @@ Based upon the syntax used in `msg-mode'.")
 	(write-region (point-min) (point-max) elisp t)))))
 
 (defun resources-compile-msg-file (buffer)
-  "Convert a Smallworld Emacs .msg file to Elisp, extension .msgc.el or .hmsgc.el"
+  "Convert a Smallworld Emacs .msg BUFFER to Elisp, extension .msgc.el or .hmsgc.el."
   (let* ((str (match-string-no-properties 1))
 	 (var (substring str 2 (- (length str) 1)))
 	 (val (replace-regexp-in-string
@@ -145,7 +149,7 @@ Based upon the syntax used in `msg-mode'.")
     (cons var val)))
     
 (defun resources-compile-hmsg-file (buffer)
-  "Convert a Smallworld Emacs .hmsg file to Elisp."
+  "Convert a Smallworld Emacs .hmsg BUFFER to Elisp."
   (let* ((str (match-string-no-properties 1))
 	 (var (substring str 2 (- (length str) 1)))
 	 (val (match-string-no-properties 3))
@@ -184,7 +188,7 @@ Use a prefix key to select a specific directory."
     (message resources-compile-resource-done)))
 
 (defun resources-add-to-Info-dir-list (resources-dir)
-  "Add .info files to Info search path.
+  "Add .info files to Info search path with stem RESOURCES-DIR.
 Only the first directory that is found containing a 'dir' file
 is added."
   ;;First get list of directories according to specified language(s)
@@ -194,9 +198,7 @@ is added."
 			  (concat "resources/" lang "/help/")
 			  resources-dir)))
 		      (reverse resources-languages)))
-	(Info-var (if xemacs-p
-		      'Info-directory-list
-		    'Info-additional-directory-list))
+	(Info-var 'Info-additional-directory-list)
 	dir)
     
     (while dirs
@@ -208,10 +210,10 @@ is added."
 	    (setq dirs nil))))))
 
 ;;Add the Info directories ./resources/LANG/help relative to this source file
-
-(or xemacs-p
-    (boundp 'Info-additional-directory-list)
-    (eval '(defvar Info-additional-directory-list nil)))
 (resources-add-to-Info-dir-list (file-name-directory load-file-name))
 
+(eval '(defvar Info-additional-directory-list nil))
+
+
 (provide 'resources)
+;;; resources.el ends here

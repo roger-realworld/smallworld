@@ -1,3 +1,9 @@
+;;; Package --- Messages for Smallworld.
+
+;;; Commentary:
+
+;;; Code:
+
 (setq resources-aliases-menu
       "Aliases")
 (setq resources-aliases-menu-run-gis
@@ -1033,3 +1039,6 @@ q      - quit
       "Copied template file %s to %s...done")
 (setq resources-template-no-header-error
       "The template file, %s, doesn't seem to have column-1 hash, #, character")
+
+(provide 'resources.msgc)
+;;; resources.msgc.el ends here

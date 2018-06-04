@@ -1,21 +1,15 @@
 ;;; utils-sw.el -- programming utils for the Smallworld lisp.
 
-(eval-when-compile (require 'cl)
-		   (require 'sort))
-
 (message "utils-sw-version $Revision: 1.13 $")
 
-(require 'cl)
-(require 'resources)
-
-(defvar sw-original-process-environment (copy-list process-environment)
+(defvar sw-original-process-environment (cl-copy-list process-environment)
   "Store the original `process-environment' at startup.
 This is used by \\[gis-version-reset-emacs-environment] to reset an
 Emacs session back to the original startup settings.
 Note that any user defined Environment variables set via \\[setenv]
 will be lost.")
 
-(defvar sw-original-exec-path (copy-list exec-path)
+(defvar sw-original-exec-path (cl-copy-list exec-path)
   "Store the original `exec-path' at startup.
 This is used by \\[gis-version-reset-emacs-environment] to reset an
 Emacs session back to the original startup settings.")
@@ -257,7 +251,7 @@ Used for determining a suitable BUFFER using the following interface:
 			 buffer)
 			(current-prefix-arg
 			 (completing-read prompt
-					  (mapcar '(lambda (b) (cons b b))
+					  (mapcar #'(lambda (b) (cons b b))
 						  (sw-buffer-mode-list mode predicate))
 					  nil nil
 					  initial))
@@ -291,39 +285,11 @@ Used for determining a suitable BUFFER using the following interface:
   (sw-define-key (current-global-map) keys function))
 
 (defun sw-define-key (map keys function)
-  (if (and xemacs-p
-           (vectorp keys))
-      (define-key
-        map
-        (apply 'vector
-               (loop for key across keys
-                     collect
-                     (if (symbolp key)
-                         (let
-                             ((str (symbol-name key)))
-                           (cond
-                            ((string-match "^S-" str)
-                             (list 'shift   (intern (substring str 2))))
-                            ((string-match "^C-" str)
-                             (list 'control (intern (substring str 2))))
-                            ((string-match "^M-" str)
-                             (list 'meta (intern (substring str 2))))
-                            ((string-match "^mouse-" str)
-                             (list (intern (concat "button" (substring str 6 7)))))
-                            (t
-                             key)))
-                       key)))
-        function)
-    (define-key map keys function)))
+    (define-key map keys function))
 
 (defun sw-delete-process-safely (process)
-  "A safe `delete-process'.
-This is to protect against Emacs 22.1.1 on Windows from hanging irretrievably
-when the subprocess being killed does not terminate quickly enough."
-  (if (and (eq system-type 'windows-nt)
-	   (equal emacs-version "22.1.1"))
-      (kill-process process)
-    (delete-process process)))
+  "A safe `delete-process' to delete PROCESS."
+    (delete-process process))
 
 (provide 'utils-sw)
 

@@ -1,12 +1,10 @@
 ;; Interface to the gis_version environment switching tool.
 
-(eval-when-compile (require 'cl))
+;;; Commentary:
 
-(require 'macros-sw)
-(require 'utils-sw)
-(require 'sw-help)
-(require 'aliases)
-(require 'gis)
+;;; Code:
+
+(require 'resources)
 
 (defgroup gis-version nil
   "Multiple Smallworld Environments."

@@ -1,14 +1,5 @@
 ;;; pragma.el -- tool for filling in Magik pragma statements.
 
-;;Note For Emacs 19 users.
-;; pragma-magik-deprecated-template-re is not correctly set up
-;; because replace-match only accepts 3 args because it only worked in buffers.
-;; Emacs 20 and later extended it to work with and optional string.
-;; Consequently, if this code is used under Emacs 19 then you are prompted to
-;; "remove modified template text" whenever the template text has been indented.
-;; This is inconvenient but it is highly recommended that you now upgrade since
-;; Emacs 19 is very old!!! 
-
 (eval-when-compile (require 'cl))
 (require 'resources)
 (require 'misc-sw)
@@ -175,10 +166,8 @@ pragma-magik-deprecated-template-end)
   "Regexp that matches any indented Template for deprecated methods.")
 
 ;;Make a regexp to match template when indented. ie. insert \s-* at front of every none empty line.
-(if (or pragma-magik-deprecated-template-re  ;;Already defined so do nothing.
-	emacs19)                             ;;cannot preform this setup in Emacs 19 (also affects compilation on 19)
-    nil
-  (setq pragma-magik-deprecated-template-re pragma-magik-deprecated-template)
+(if (not pragma-magik-deprecated-template-re)
+    (setq pragma-magik-deprecated-template-re pragma-magik-deprecated-template)
   (let (start)
     (while (string-match "^\\(\\s-*\\)\\S-+" pragma-magik-deprecated-template-re start)
       (setq pragma-magik-deprecated-template-re (replace-match "\\s-*" nil t pragma-magik-deprecated-template-re 1))

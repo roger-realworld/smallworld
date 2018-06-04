@@ -1714,8 +1714,7 @@ If `compare-ignore-case' is non-nil, changes in case are also ignored."
 (defun magik-ediff-regions-wordwise-internal (buffer-A reg-A-beg reg-A-end buffer-B reg-B-beg reg-B-end job-name)
   (require 'ediff) ; ediff-regions-internal is not an autoloaded function...
   (let ((args (list buffer-A reg-A-beg reg-A-end buffer-B reg-B-beg reg-B-end nil job-name 'word-mode)))
-    (if (not emacs19)
-	(setq args (append args (list nil))))
+  (setq args (append args (list nil)))
     (apply 'ediff-regions-internal args)))
 
 (defun magik-ediff-methods (&optional buffer-A buffer-B)

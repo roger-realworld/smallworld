@@ -1,5 +1,7 @@
 ;;; sw_defaults.el -- Smallworld customisations.
 
+;;; Commentary:
+
 ;; This file gets loaded by the standard Emacs Smallworld `.emacs' file.
 
 ;; The Smallworld extensions to Emacs have been designed to complement
@@ -11,20 +13,18 @@
 ;; The sure way to find out whether something is standard is to try it
 ;; in a bare Emacs, which you can start at any time by typing:
 ;;     `emacs --no-site-file --no-init-file'
-;; or for Emacs 19:
-;;     `emacs -q'
 ;; at a shell prompt.
 
 ;; Appended to the bottom of this file are lots of examples of how to
-;; change emacs key-bindings, and also how to add abbrevs.
+;; change Emacs key-bindings, and also how to add abbrevs.
 
+;;; Code:
 
 (eval-and-compile (require 'cl))
 (require 'macros-sw)
 (require 'utils-sw)
 (require 'eieio-core)
 (require 'swkeys)
-(or xemacs-p (require 'faces))
 
 (defconst sw_defaults-version "$Revision: 1.49 $")
 
@@ -61,8 +61,8 @@
 ;; a running process.
 
 (defun check-buffer-has-no-process ()
-  "Return true if there is no process in the current buffer or
-if the user confirms that it is ok to kill the buffer anyway."
+  "Return non-nil if there is no process in the current buffer.
+Or if the user confirms that it is ok to kill the buffer anyway."
   (let* ((proc (get-buffer-process (current-buffer)))
 	 (filter (and proc (process-filter proc)))
 	 (response t))
@@ -82,64 +82,6 @@ if the user confirms that it is ok to kill the buffer anyway."
 	      kill-buffer-query-functions))
 
 
-;; On some HP keyboards the vertical bar character, `|', generates the
-;; broken-bar character (ascii 166, octal 246), and so we use the
-;; low-level Emacs keyboard-translation mechanism to override this.
-;; In order to get a broken-bar character you now have to type
-;; `C-q 2 4 6'.
-
-(eval-if-gnu-emacs
- (if (equal (getenv "HOST_OS") "HP-UX")
-     (keyboard-translate ?\246 ?|)))
-
-
-;; On Windows-NT, various keys seem to fail when the CAPS LOCK
-;; is on, so we bind the shifted keys explicitly.
-
-;;(if (running-under-nt)
-;;    (progn
-;;      (global-set-key [S-down] [down])
-;;      (global-set-key [S-up] [up])
-;;      (global-set-key [S-right] [right])
-;;      (global-set-key [S-left] [left])
-;;      (global-set-key [S-delete] [delete])
-;;      (global-set-key [S-down-mouse-1] 'mouse-drag-region)
-;;      (global-set-key [S-down-mouse-3] 'mouse-save-then-kill)
-;;      (global-set-key [S-mouse-3] 'mouse-save-then-kill)
-;;      (global-set-key [S-backspace] 'backward-delete-char-untabify)
-;;      (global-set-key [S-delete] 'backward-delete-char-untabify)
-;;      (global-set-key [S-next] [next])
-;;      (global-set-key [S-prior] [prior])
-;;      (global-set-key [S-home] [home])
-;;      (global-set-key [S-end] [end])))
-
-
-
-;; To get the standard key-bindings back, add these 8 lines (without
-;; the leading semi-colons) to your `~/.emacs'.
-;;
-;; (global-set-key "\C-z" 'iconify-frame)
-;; (global-set-key "\M-," 'tags-loop-continue)
-;; (sw-global-set-key [C-delete] nil)
-;; (sw-global-set-key [S-return] nil)
-;; (keyboard-translate ?\246 ?\246)
-;; (setq kill-buffer-query-functions
-;;       (remove* 'check-buffer-has-no-process
-;;                kill-buffer-query-functions))
-
-
-
-;; In later versions of GNU Emacs there is some strange hard-wired
-;; binding of two-column mode to the F2 key.  In order to avoid start-up
-;; errors caused by clashes with our F2 bindings, it is easier to remove
-;; the default binding first.
-;;
-(if (running-under-nt)
-    (global-set-key [f2] nil))
-
-
-
-
 ;;   M O U S E   D R A G G I N G
 ;;   ---------------------------
 
@@ -150,30 +92,28 @@ if the user confirms that it is ok to kill the buffer anyway."
 ;; modeline dragging is already implemented in XEmacs and is bound to
 ;; the left button).
 
-;; Note for Emacs 21, dragging with mouse-1 is enabled.
-(eval-if-gnu-emacs
- (global-set-key [drag-mouse-2] 'mouse-scroll-screen)
- (global-set-key [mode-line drag-mouse-2]  'mode-line-resize)
+(global-set-key [drag-mouse-2] 'mouse-scroll-screen)
+(global-set-key [mode-line drag-mouse-2]  'mode-line-resize)
 
- ;; So that people don't inadvertantly try and drag the modeline with
- ;; the left mouse button, we define an action for drag-mouse-1:
+;; So that people don't inadvertantly try and drag the modeline with
+;; the left mouse button, we define an action for drag-mouse-1:
 
- ;; Note for Emacs 21, dragging with mouse-1 is already setup and is
- ;; actually still enabled so for some reason the following code is ignored...
- (defun drag-mouse-message ()
-   (interactive)
-   (message "To drag modelines or buffers up and down, use the middle button."))
+;; Note for Emacs 21, dragging with mouse-1 is already setup and is
+;; actually still enabled so for some reason the following code is ignored...
+(defun drag-mouse-message ()
+  "Drag Mouse message."
+  (interactive)
+  (message "To drag modelines or buffers up and down, use the middle button."))
 
- (global-set-key [mode-line drag-mouse-1] 'drag-mouse-message))
+(global-set-key [mode-line drag-mouse-1] 'drag-mouse-message))
 
 ;; In case the mouse doesn't have a middle button, we make
 ;; Control-Shift-left-button do whatever the middle button would do.
 
-(eval-if-gnu-emacs
- (sw-global-set-key [C-S-mouse-1] 'c-s-mouse-1))
+(sw-global-set-key [C-S-mouse-1] 'c-s-mouse-1)
 
 (defun c-s-mouse-1 (e arg)
-  "Do whatever the middle mouse button is meant to do."
+  "Do whatever the middle mouse button is meant to do on E with ARG."
   ;; To make this work we are assuming that the global mouse-2 action
   ;; has a prefix arg and the local mouse-2 actions don't.
   (interactive "e\nP")
@@ -217,14 +157,9 @@ if the user confirms that it is ok to kill the buffer anyway."
 (require 'paren)
 (and (fboundp 'show-paren-mode)
      (show-paren-mode t))
-;; Toggle this feature with 
+;; Toggle this feature with this command:
 ;;
 ;; (show-paren-mode)
-;;
-;; or on Emacs 19 with:
-;; (setq show-paren-face nil) ;to turn it off
-;; (setq show-paren-face 'region) ; to turn it on, using the region face
-;;                                  to highlight matching  parentheses
 ;;
 ;; paren mode only checks parenthesis matching upto a certain character
 ;; limit. To change that limit use:
@@ -268,22 +203,11 @@ if the user confirms that it is ok to kill the buffer anyway."
 ;;; incremental search options
 ;; Make incremental search highlight the current match.
 ;; You can cancel this with:  (setq search-highlight nil)
-(eval-if-gnu-emacs
- (or (running-under-nt)
-     (setq search-highlight t)))
+(setq search-highlight t)
 
 ;;   I N T E R N A T I O N A L I S A T I O N
 ;;   ---------------------------------------
 
-;; Emacs has different `input methods' for inputing foreign
-;; characters using a qwerty keyboard.  The "im" in "leim"
-;; stands for "input method".
-;;
-;; We locate the `leim' directory relative to the one of the
-;; the .../lisp/* directories on the load-path.
-
-(or emacs19
-    (load "leim-list"))
 
 ;;;;   M I S C E L L A N E O U S
 ;;;;   -------------------------
@@ -326,25 +250,6 @@ if the user confirms that it is ok to kill the buffer anyway."
      ;; see documentation on c-default-style for further details.
      (setq c-default-style "user")))
 
-;;
-;; Gnu Emacs 19 settings...
-;;
-;; Override the slightly unusual GNU indentation style.
-;; Note that the cc-mode in XEmacs uses an entirely different set of switches.
-(eval-if (and emacs19 (not xemacs-p))
-	 (setq c-argdecl-indent 4)
-	 (setq c-continued-brace-offset -2)
-	 (setq c-indent-level 4)
-	 (setq c-label-offset -4)
-	 ;; You can set these back to the original values with:
-	 ;;
-	 ;; (setq c-argdecl-indent 5)
-	 ;; (setq c-continued-brace-offset -2)
-	 ;; (setq c-indent-level 2)
-	 ;; (setq c-label-offset -2)
-	 )
-
-
 
 ;; Make Emacs scroll in 4-line jumps rather than half-screen jumps.
 ;; You can get the default behaviour back again with:  (setq scroll-step 0)
@@ -377,41 +282,6 @@ if the user confirms that it is ok to kill the buffer anyway."
 ;; (setq backup-by-copying-when-linked nil)
 
 
-;; On Windows NT, we want all files to be treated as binary so that Emacs doesn't
-;; put control-M characters at the end of each line.  This is because most of our
-;; files are stored on Unix machines via NFS, and therefore don't use the
-;; carriage-return/line-feed convention.
-;;
-;; This collection of 2 defuns and 3 setqs is probably over-kill but will do for
-;; now.
-;;
-;; 5th May 1999: Emacs 20.4 (and probably earlier versions of Emacs 20) seems
-;; to have solved the CR-LF problems and so this code only runs for Emacs 19.
-
-;;BUG??(eval-if (and (running-under-nt) emacs19)
-(if (and (running-under-nt) emacs19)
-    (progn
-      (defun find-buffer-file-type (filename) t)
-      (defun file-not-found-set-buffer-file-type () t)
-      (setq file-name-buffer-file-type-alist '(("" . t)))
-      (setq default-buffer-file-type t)
-      (setq-default buffer-file-type t)))
-
-
-;; Emacs 20 puts the scroll bar on the left by default.
-;; This is probably disorienting for Emacs 19 users (or
-;; users of any other software) and so we put it on the
-;; right
-
-(if (fboundp 'set-scroll-bar-mode)
-    (set-scroll-bar-mode 'right))
-
-;; Undo this change with:
-;;
-;; (set-scroll-bar-mode 'left)
-  
-
-  
 
 ;;   C O S M E T I C   C H A N G E S
 ;;   -------------------------------
@@ -421,14 +291,13 @@ if the user confirms that it is ok to kill the buffer anyway."
 ;; foreground as white, to prevent it defaulting new frames to a black
 ;; foreground).
 
-(eval-if-gnu-emacs
- (require 'faces)
- (if (running-under-x)
-     (progn
-       (setq x-pointer-shape x-pointer-left-ptr)
-       (set-mouse-color "blue")
-       (set-face-background 'modeline "brown")
-       (set-face-foreground 'modeline "white"))))
+(require 'faces)
+(if (running-under-x)
+    (progn
+      (setq x-pointer-shape x-pointer-left-ptr)
+      (set-mouse-color "blue")
+      (set-face-background 'modeline "brown")
+      (set-face-foreground 'modeline "white")))
 
 ;; Undo all this with:
 ;;
@@ -505,7 +374,7 @@ if the user confirms that it is ok to kill the buffer anyway."
 ;; after they are loaded. This removes/minimises any hardcoded changes from these packages
 ;; that we want to make.
 ;;
-;; For example, in nXML the &nbsp; entity definition is missing, so instead of 
+;; For example, in nXML the &nbsp; entity definition is missing, so instead of
 ;; copying the current setting from the package we just use an eval-after-load form
 ;; with some code to append the nbsp entity definition. Future versions of nXML may
 ;; fix this omission and the code below will not break or reduce functionality.

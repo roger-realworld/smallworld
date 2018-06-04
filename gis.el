@@ -1,7 +1,9 @@
 ;;; gis.el -- mode for running a Smallworld GIS.
-;;
+
+;;; Commentary:
+
 ;;; The filter for the gis process is in filter.el
-;;
+
 ;; This is a new version of the gis-mode that uses a vector of marker
 ;; pairs rather than a list.  This allows us to move up and down the
 ;; array efficiently and also use things like binary search.
@@ -58,7 +60,9 @@
 ;; the RET key, the gis-cmd-num is set to 0 (as if it had been
 ;; typed by hand) rather than the number of the command that was
 ;; recalled.
-; shut compiler up
+					; shut compiler up
+
+;;; code:
 (eval-when-compile
   (require 'cl)
   (require 'comint)
@@ -423,11 +427,10 @@ and return a list of all the components of the command."
   ;;to cope with quotes and possible escaped quotes.
   ;;forward-sexp therefore guarantees preservation of white within quoted regions.
   ;;However, I do some extra work to try and remove the surrounding quotes from the returned result
-  ;;unless I am running on NT Emacs19, because the sub-process functionality is less sophisticated.
 
   (let ((temp-buf (get-buffer-create " *gis-command parser*"))
 	(command-list)
-	(leave-quotes (and (running-under-nt) emacs19))) ;leave surrounding quotes on NT Emacs19 
+	(leave-quotes nil))
     (save-excursion
       (save-match-data
 	(set-buffer temp-buf)
@@ -542,7 +545,7 @@ and return a list of all the components of the command."
 		   ':active
 		   '(not (get-buffer-process (buffer-name)))
 		   ;; ':key-sequence nil
-		   (if xemacs-p nil (list ':help (purecopy command)))) ;XEmacs does not handle :help
+		   (list ':help (purecopy command)))
 		  command-list)))
 
 	(if (get-buffer-process (buffer-name))
@@ -551,8 +554,8 @@ and return a list of all the components of the command."
 			  (list "---"
 				(apply 'vector (gis-command-display gis-current-command)
 				       'ignore ':active nil
-				       (if xemacs-p nil (list ':key-sequence nil
-							      ':help (purecopy gis-current-command))))
+				       (list ':key-sequence nil
+					     ':help (purecopy gis-current-command)))
 				(apply 'vector resources-menu-sw-run-new-gis 'gis-new-buffer
 				       ':active t
 				       ':keys '("C-u f2 z"))))))
